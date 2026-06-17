@@ -1723,7 +1723,7 @@ function loadSession(){
     if(!raw) return false;
     const s = JSON.parse(raw);
     // 7일 이상 지난 세션은 만료
-    if(Date.now() - s.ts > 7 * 24 * 60 * 60 * 1000){
+    if(Date.now() - s.ts > 365 * 24 * 60 * 60 * 1000){
       localStorage.removeItem(SESSION_KEY);
       return false;
     }
