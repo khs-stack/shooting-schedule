@@ -1,0 +1,25 @@
+{
+  "name": "메뉴잇 파트너",
+  "short_name": "메뉴잇파트너",
+  "description": "촬영·시공·온보딩 파트별 일정 배분, 응답·완료 검수 및 정산 관리",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f0f2f8",
+  "theme_color": "#f0f2f8",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
