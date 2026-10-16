@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="icon-192.png">
+<title>메뉴잇 설치 확인서</title>
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--line:#e4e4e0;--ink:#151515;--ink2:#3a3a3a;--ink3:#6b6b6b;--accent:#f26b1d;--ok:#1b7a4c;--ok-soft:#e3f5ea;--danger:#c62828;
+  --font:"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
+.doc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
+.brand b{display:block;font-size:13px;letter-spacing:.14em;color:var(--ink3)}.brand h1{margin:0;font-size:21px}
+dl{margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+dl div{display:grid;grid-template-columns:86px 1fr;border-bottom:1px solid #efefec;font-size:15px}dl div:last-child{border-bottom:0}
+dt{background:#fafaf8;color:var(--ink3);padding:9px 10px}dd{margin:0;padding:9px 10px;white-space:pre-wrap;word-break:break-all}
+.confirm{margin:16px 0;padding:12px 14px;background:#fafaf8;border-radius:10px;font-size:15px;color:var(--ink2)}
+label{display:grid;gap:6px;font-size:14px;color:var(--ink3);margin-top:14px}
+input{border:1px solid var(--line);border-radius:10px;height:48px;padding:0 12px;font-size:16px;background:#fff}
+.pad-wrap{position:relative;margin-top:6px}
+canvas{display:block;width:100%;height:200px;border:1.5px dashed #c9c9c4;border-radius:12px;background:#fff;touch-action:none}
+.hint{position:absolute;inset:0;display:grid;place-items:center;color:#b0b0aa;pointer-events:none;font-size:15px}
+.row{display:flex;gap:8px;margin-top:14px}
+.btn{border:0;border-radius:12px;height:52px;font-weight:700;font-size:16px;background:var(--ink);color:#fff;flex:1}
+.btn.accent{background:var(--accent)}.btn.line{background:#fff;color:var(--ink);border:1px solid var(--line);flex:0 0 96px}
+.btn:disabled{opacity:.5}
+.err{color:var(--danger);font-size:14px;min-height:20px;margin-top:8px}
+.done{text-align:center;padding:24px 8px}.done .big{font-size:44px}.done h2{margin:6px 0 4px}.done p{color:var(--ink3);margin:0}
+.back{display:inline-block;margin-top:16px;color:var(--ink2);font-size:15px}
+.foot{text-align:center;color:var(--ink3);font-size:12.5px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="doc" id="doc"><p style="color:var(--ink3)">불러오는 중…</p></div><p class="foot">메뉴잇 · 설치 확인서</p></div>
+<script>
+const SB_URL = "https://fqkwokupgcxvcjsbuupb.supabase.co";
+const SB_KEY = "sb_publishable_W0ajtBYOzCg5ZW0vsaagUQ_6_B1OtoR";
+const q = new URLSearchParams(location.search), TOKEN = q.get("t") || "", BACK = q.get("back") === "1";
+const h = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const doc = document.getElementById("doc");
+async function rpc(fn, args) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(args) });
+  if (!r.ok) throw new Error("network"); return r.json();
+}
+const fmtD = (d) => (d ? `${d.slice(0, 4)}년 ${Number(d.slice(5, 7))}월 ${Number(d.slice(8, 10))}일` : "");
+const backLink = () => (BACK ? `<a class="back" href="partner.html">← 내 일정으로 돌아가기</a>` : "");
+
+function doneView(name, at) {
+  doc.innerHTML = `<div class="done"><div class="big">✅</div><h2>서명이 완료됐어요</h2><p>${h(name || "")}${at ? " · " + h(new Date(at).toLocaleString("ko-KR")) : ""}</p><p style="margin-top:6px">메뉴잇을 이용해 주셔서 감사합니다.</p>${backLink()}</div>`;
+}
+
+async function init() {
+  if (TOKEN.length < 24) { doc.innerHTML = `<div class="done"><div class="big">⚠️</div><h2>잘못된 링크예요</h2><p>담당자에게 링크를 다시 받아 주세요.</p></div>`; return; }
+  let j; try { j = await rpc("sign_get", { p_sign: TOKEN }); } catch { doc.innerHTML = `<div class="done"><div class="big">📡</div><h2>연결이 원활하지 않아요</h2><p>잠시 후 새로고침해 주세요.</p></div>`; return; }
+  if (!j || !j.ok) { doc.innerHTML = `<div class="done"><div class="big">⚠️</div><h2>확인서를 찾을 수 없어요</h2><p>담당자에게 링크를 다시 받아 주세요.</p>${backLink()}</div>`; return; }
+  if (j.signed) return doneView(j.sign_name, j.signed_at);
+  const work = [j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type || ""].filter(Boolean).join(" · ");
+  doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(j.part)} 완료 확인서</h1></div></div>
+    <dl>
+      <div><dt>매장명</dt><dd>${h(j.store_name)}</dd></div>
+      ${j.store_address ? `<div><dt>주소</dt><dd>${h(j.store_address)}</dd></div>` : ""}
+      ${work ? `<div><dt>장비</dt><dd>${h(work)}</dd></div>` : ""}
+      ${j.work_detail ? `<div><dt>작업 내용</dt><dd>${h(j.work_detail)}</dd></div>` : ""}
+      <div><dt>작업일</dt><dd>${h(fmtD(j.visit_date || new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)))}</dd></div>
+      ${j.partner ? `<div><dt>작업자</dt><dd>${h(j.partner)}</dd></div>` : ""}
+    </dl>
+    <div class="confirm">위 매장에 메뉴잇 ${h(j.part)} 작업이 완료되었으며, 장비 설치 상태와 작동을 확인했습니다.</div>
+    <label>확인자 성함<input id="nm" placeholder="예: 홍길동 (대표)" autocomplete="name"></label>
+    <label>서명</label>
+    <div class="pad-wrap"><canvas id="pad"></canvas><div class="hint" id="hint">여기에 손가락으로 서명해 주세요</div></div>
+    <div class="err" id="err"></div>
+    <div class="row"><button class="btn line" id="clr">지우기</button><button class="btn accent" id="ok">서명 완료</button></div>
+    ${backLink()}`;
+  setupPad();
+}
+
+function setupPad() {
+  const c = document.getElementById("pad"), ctx = c.getContext("2d"), hint = document.getElementById("hint");
+  let drawing = false, dirty = false, last = null;
+  const size = () => { const r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1; c.width = r.width * dpr; c.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.lineWidth = 2.6; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#111"; dirty = false; hint.style.display = ""; };
+  size();
+  const pt = (e) => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  c.addEventListener("pointerdown", (e) => { drawing = true; last = pt(e); c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.arc(last[0], last[1], 1.2, 0, Math.PI * 2); ctx.fill(); dirty = true; hint.style.display = "none"; });
+  c.addEventListener("pointermove", (e) => { if (!drawing) return; const p = pt(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; });
+  const end = () => { drawing = false; }; c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
+  document.getElementById("clr").onclick = size;
+  document.getElementById("ok").onclick = async (e) => {
+    const nm = document.getElementById("nm").value.trim(), err = document.getElementById("err");
+    if (!nm) { err.textContent = "확인자 성함을 입력해 주세요."; return; }
+    if (!dirty) { err.textContent = "서명란에 서명해 주세요."; return; }
+    // shrink to a light PNG
+    const out = document.createElement("canvas"), w = 600, hh = Math.round(600 * c.height / c.width); out.width = w; out.height = hh;
+    const o = out.getContext("2d"); o.fillStyle = "#fff"; o.fillRect(0, 0, w, hh); o.drawImage(c, 0, 0, w, hh);
+    const img = out.toDataURL("image/png");
+    e.target.disabled = true; e.target.textContent = "저장 중…"; err.textContent = "";
+    try {
+      const r = await rpc("sign_submit", { p_sign: TOKEN, p_name: nm, p_image: img });
+      if (r && r.ok) return doneView(nm, new Date().toISOString());
+      if (r && r.error === "already") return init();
+      err.textContent = "저장하지 못했어요. 다시 시도해 주세요.";
+    } catch { err.textContent = "연결이 원활하지 않아요. 다시 시도해 주세요."; }
+    e.target.disabled = false; e.target.textContent = "서명 완료";
+  };
+}
+init();
+</script>
+</body>
+</html>
