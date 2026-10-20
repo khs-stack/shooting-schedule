@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="메뉴잇 파트너">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <title>메뉴잇 파트너</title>
 <style>
 /* 작업 지시서: 어두운 오늘 패널 + 절취선이 있는 작업 티켓. 주황은 '지금 할 일'에만. */
@@ -18,7 +18,7 @@
   --brand:#f26b1d; --brand-soft:#fff0e6; --go:#157a52; --go-soft:#e2f3ea; --sky:#2563c9; --sky-soft:#e7effb;
   --amber:#a86400; --amber-soft:#fdf1d8; --alert:#c8302a; --alert-soft:#fbe9e7;
   --r:16px; --fs:16px;
-  --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:var(--fs);line-height:1.45;-webkit-text-size-adjust:100%;letter-spacing:-.01em}
@@ -69,9 +69,9 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .tk{background:var(--card);border-radius:var(--r);margin-bottom:12px;box-shadow:0 1px 0 rgba(20,25,35,.04),0 6px 18px -10px rgba(20,25,35,.18);overflow:hidden}
 .tk-head{display:grid;grid-template-columns:72px 1fr;gap:12px;padding:16px 16px 14px}
 .tk-date{border-right:1px solid var(--line2);padding-right:12px;text-align:center}
-.tk-date .d{font-size:1.5em;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.tk-date .d{font-size:1.25em;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .tk-date .w{font-size:.76em;color:var(--ink3);font-weight:600;margin-top:2px}
-.tk-date .t{margin-top:6px;font-size:.82em;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.tk-date .t{margin-top:6px;font-size:.82em;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums}
 .tk-date.none .d{font-size:1.05em;color:var(--brand);line-height:1.2}
 .tk-title{min-width:0}
 .tk-title .tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
