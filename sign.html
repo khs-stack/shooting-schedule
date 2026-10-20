@@ -60,8 +60,9 @@ async function init() {
   let j; try { j = await rpc("sign_get", { p_sign: TOKEN }); } catch { doc.innerHTML = `<div class="done"><div class="big">📡</div><h2>연결이 원활하지 않아요</h2><p>잠시 후 새로고침해 주세요.</p></div>`; return; }
   if (!j || !j.ok) { doc.innerHTML = `<div class="done"><div class="big">⚠️</div><h2>확인서를 찾을 수 없어요</h2><p>담당자에게 링크를 다시 받아 주세요.</p>${backLink()}</div>`; return; }
   if (j.signed) return doneView(j.sign_name, j.signed_at);
+  if (j.done === false) { doc.innerHTML = `<div class="done"><div class="big">🛠️</div><h2>아직 작업이 끝나지 않았어요</h2><p>작업 완료 후에 서명할 수 있어요.</p>${backLink()}</div>`; return; }
   const work = [j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type || ""].filter(Boolean).join(" · ");
-  doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(j.part)} 완료 확인서</h1></div></div>
+  doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(({시공:"설치 확인서",촬영:"촬영 완료 확인서",온보딩:"온보딩 완료 확인서"})[j.part]||"완료 확인서")}</h1></div></div>
     <dl>
       <div><dt>매장명</dt><dd>${h(j.store_name)}</dd></div>
       ${j.store_address ? `<div><dt>주소</dt><dd>${h(j.store_address)}</dd></div>` : ""}
@@ -70,7 +71,7 @@ async function init() {
       <div><dt>작업일</dt><dd>${h(fmtD(j.visit_date || new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)))}</dd></div>
       ${j.partner ? `<div><dt>작업자</dt><dd>${h(j.partner)}</dd></div>` : ""}
     </dl>
-    <div class="confirm">위 매장에 메뉴잇 ${h(j.part)} 작업이 완료되었으며, 장비 설치 상태와 작동을 확인했습니다.</div>
+    <div class="confirm">위 매장에 메뉴잇 ${h(j.part)} 작업이 완료되었으며, ${j.part==="촬영"?"촬영이 정상적으로 진행되었음을":"장비 설치 상태와 작동을"} 확인했습니다.</div>
     <label>확인자 성함<input id="nm" placeholder="예: 홍길동 (대표)" autocomplete="name"></label>
     <label>서명</label>
     <div class="pad-wrap"><canvas id="pad"></canvas><div class="hint" id="hint">여기에 손가락으로 서명해 주세요</div></div>

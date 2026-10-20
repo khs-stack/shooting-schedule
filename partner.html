@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#f6f6f4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="메뉴잇 파트너">
 <link rel="icon" href="icon-192.png">
@@ -13,89 +13,156 @@
 :root{
   --bg:#f6f6f4;--card:#fff;--line:#e4e4e0;--line2:#efefec;--ink:#151515;--ink2:#3a3a3a;--ink3:#6b6b6b;
   --accent:#f26b1d;--accent-soft:#fff1e8;--ok:#1b7a4c;--ok-soft:#e3f5ea;--blue:#1f6fd1;--blue-soft:#e8f1fc;
-  --warn:#a35f00;--warn-soft:#fff3d6;--danger:#c62828;--r:14px;
+  --warn:#a35f00;--warn-soft:#fff3d6;--danger:#c62828;--danger-soft:#fdecea;--r:14px;--fs:16px;
   --font:"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:var(--fs);line-height:1.45;-webkit-text-size-adjust:100%}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 a{color:inherit}
 .wrap{max-width:640px;margin:0 auto;padding:0 16px calc(96px + env(safe-area-inset-bottom))}
-header{position:sticky;top:0;z-index:5;background:rgba(246,246,244,.94);backdrop-filter:blur(8px);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;background:rgba(246,246,244,.95);backdrop-filter:blur(8px);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line)}
 .hd{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:10px}
-.mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
-.hd b{font-size:17px;display:block;line-height:1.2}.hd small{color:var(--ink3);font-size:13px}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.hd b{font-size:1.05em;display:block;line-height:1.2}.hd small{color:var(--ink3);font-size:.8em}
 .hd .sp{margin-left:auto;display:flex;gap:6px}
-.icon-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:38px;padding:0 12px;font-size:14px;font-weight:600}
+.icon-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:38px;padding:0 12px;font-size:.88em;font-weight:600}
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs .in{display:flex;max-width:640px;width:100%}
+nav.tabs button{flex:1;border:0;background:none;display:grid;justify-items:center;gap:1px;padding:6px 0;color:var(--ink3);font-size:.72em;font-weight:700;letter-spacing:.02em}
+nav.tabs button i{font-style:normal;font-size:1.45em;line-height:1.1}
+nav.tabs button.on{color:var(--accent)}
+nav.tabs .n{font-size:.9em;color:inherit}
 /* login */
 .login{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
 .login form{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 22px;display:grid;gap:14px}
-.login h1{margin:0;font-size:22px}.login p{margin:0;color:var(--ink3);font-size:14px}
-label{display:grid;gap:6px;font-size:14px;color:var(--ink3)}
-input,textarea,select{border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 12px;height:48px;font-size:16px;width:100%}
-textarea{height:auto;min-height:84px;padding:10px 12px;resize:vertical}
-.btn{border:0;border-radius:12px;height:50px;font-weight:700;font-size:16px;background:var(--ink);color:#fff;width:100%}
+.login h1{margin:0;font-size:1.4em}.login p{margin:0;color:var(--ink3);font-size:.88em}
+label{display:grid;gap:6px;font-size:.88em;color:var(--ink3)}
+input,textarea,select{border:1px solid var(--line);border-radius:10px;background:#fff;padding:0 12px;height:46px;font-size:16px;width:100%}
+textarea{height:auto;min-height:84px;padding:10px 12px;resize:vertical;line-height:1.5}
+.btn{border:0;border-radius:12px;height:48px;font-weight:700;font-size:1em;background:var(--ink);color:#fff;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .btn.accent{background:var(--accent)}.btn.ok{background:var(--ok)}.btn.line{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:#fff;color:var(--danger);border:1px solid var(--danger)}
+.btn.sm{height:40px;font-size:.9em;border-radius:10px}
 .btn:disabled{opacity:.5}
-.err{color:var(--danger);font-size:14px;min-height:20px}
-/* tabs */
-.tabs{display:flex;gap:6px;margin:14px 0 12px;overflow-x:auto}
-.tab{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:15px;font-weight:600;white-space:nowrap;color:var(--ink2)}
-.tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
-.tab .n{margin-left:5px;font-variant-numeric:tabular-nums;opacity:.8}
-.day{font-size:14px;font-weight:700;color:var(--ink3);margin:18px 2px 8px;display:flex;gap:8px;align-items:center}
-.day.today{color:var(--accent)}
+.err{color:var(--danger);font-size:.88em;min-height:20px}
+h2.title{font-size:1.25em;margin:16px 2px 10px;display:flex;align-items:baseline;gap:8px}
+h2.title small{font-size:.65em;color:var(--ink3);font-weight:600}
+/* filters */
+.fbar{display:grid;gap:8px;margin-bottom:10px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:.86em;font-weight:600;white-space:nowrap;color:var(--ink2)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.sub.on{background:var(--accent);border-color:var(--accent)}
+.range{display:flex;gap:6px;align-items:center}
+.range input{height:40px;font-size:15px;padding:0 8px}
+.search{height:42px}
+.fsum{font-size:.82em;color:var(--ink3);display:flex;justify-content:space-between;align-items:center}
+.fsum button{border:0;background:none;color:var(--accent);font-weight:700;font-size:1em;padding:0}
+.day{font-size:.88em;font-weight:700;color:var(--ink3);margin:18px 2px 8px}
+.day.today{color:var(--accent)}.day.late{color:var(--danger)}
 /* card */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
-.card-top{display:flex;gap:8px;align-items:flex-start}
-.card h3{margin:0;font-size:18px;line-height:1.3;flex:1;min-width:0}
-.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
-.p-배정{background:var(--warn-soft);color:var(--warn)}.p-일정확정{background:var(--blue-soft);color:var(--blue)}.p-완료{background:var(--ok-soft);color:var(--ok)}
+.card-top{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.card h3{margin:0;font-size:1.12em;line-height:1.3;flex:1 1 60%;min-width:0}
+.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:.78em;font-weight:700;white-space:nowrap}
+.p-배정{background:var(--warn-soft);color:var(--warn)}.p-일정확정{background:var(--blue-soft);color:var(--blue)}.p-완료{background:var(--ok-soft);color:var(--ok)}.p-서명{background:var(--ok);color:#fff}
 .part{background:var(--accent-soft);color:var(--accent)}
-.meta{margin-top:8px;display:grid;gap:4px;font-size:14.5px;color:var(--ink2)}
-.meta .row{display:flex;gap:8px}.meta .k{color:var(--ink3);flex:none;width:52px}
+.meta{margin-top:8px;display:grid;gap:4px;font-size:.9em;color:var(--ink2)}
+.meta .row{display:flex;gap:8px}.meta .k{color:var(--ink3);flex:none;width:56px}
 .meta .v{min-width:0;word-break:break-all}
-.work{margin-top:10px;background:#fafaf8;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:14.5px;white-space:pre-wrap}
+.fee{margin-top:10px;display:flex;justify-content:space-between;align-items:center;background:#fafaf8;border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:.9em}
+.fee b{font-variant-numeric:tabular-nums;font-size:1.05em}
+.fee small{color:var(--ink3)}
+.work{margin-top:8px;background:#fafaf8;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:.9em;white-space:pre-wrap}
 .links{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.links a,.links button{flex:1 1 auto;text-align:center;text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 8px;font-size:14px;font-weight:600}
+.links a,.links button{flex:1 1 auto;text-align:center;text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 8px;font-size:.88em;font-weight:600}
 .links .call{color:var(--ok)}
 .when{margin-top:12px;display:grid;grid-template-columns:1fr 110px;gap:8px}
-.when.sm{grid-template-columns:1fr}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.acts .btn{height:46px;font-size:15px}
-.signed{margin-top:10px;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ok);font-weight:600}
-.empty{text-align:center;color:var(--ink3);padding:48px 16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r)}
-.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+.acts .full{grid-column:1/-1}
+.signed{margin-top:10px;display:flex;align-items:center;gap:8px;font-size:.88em;color:var(--ok);font-weight:600}
+.lock{margin-top:8px;font-size:.82em;color:var(--ink3)}
+.empty{text-align:center;color:var(--ink3);padding:44px 16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;color:var(--ink);font-size:1.05em;margin-bottom:4px}
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
-.stat small{color:var(--ink3);font-size:13px}.stat b{display:block;font-size:28px;font-variant-numeric:tabular-nums;margin-top:2px}
+.stat small{color:var(--ink3);font-size:.8em}.stat b{display:block;font-size:1.65em;font-variant-numeric:tabular-nums;margin-top:2px}
 .stat.hi b{color:var(--accent)}
-.sub-h{font-size:15px;margin:22px 2px 8px;color:var(--ink2)}
+.sub-h{font-size:.95em;margin:22px 2px 8px;color:var(--ink2)}
 .mini{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.mini div{display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line2);font-size:15px}
-.mini div:last-child{border-bottom:0}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;font-size:14px;z-index:30;max-width:90vw}
+.mini > div{display:flex;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line2);font-size:.92em}
+.mini > div:last-child{border-bottom:0}
+.mini b{font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--line2);border-radius:99px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--accent)}
+.st-badge{font-size:.78em;font-weight:700;border-radius:999px;padding:3px 9px}
+.s-확인요청{background:var(--accent);color:#fff}.s-파트너확인{background:var(--ok-soft);color:var(--ok)}.s-이의제기{background:var(--danger-soft);color:var(--danger)}
+.s-기안완료{background:var(--blue-soft);color:var(--blue)}.s-지급완료{background:var(--ok);color:#fff}
+.notice{background:var(--accent-soft);border:1px solid #f7c9a8;border-radius:var(--r);padding:12px 14px;font-size:.9em;margin-bottom:10px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;font-size:.88em;z-index:60;max-width:90vw}
 .toast.bad{background:var(--danger)}
-.sync{font-size:12.5px;color:var(--ink3);text-align:center;margin-top:10px}
-details.more summary{list-style:none;cursor:pointer;color:var(--ink3);font-size:14px;margin-top:10px}
+.sync{font-size:.78em;color:var(--ink3);text-align:center;margin-top:10px}
+details.more{margin-top:10px}
+details.more summary{list-style:none;cursor:pointer;color:var(--ink3);font-size:.88em}
 details.more summary::-webkit-details-marker{display:none}
+.set-sec{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;display:grid;gap:10px}
+.set-sec h3{margin:0;font-size:1em}
+.set-sec .hint{font-size:.8em;color:var(--ink3);margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vars{font-size:.78em;color:var(--ink3);line-height:1.6}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(20,15,10,.45);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:92vh;z-index:41;background:var(--bg);border-radius:18px 18px 0 0;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+.sh-head{display:flex;align-items:center;gap:10px;padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+.sh-head h3{margin:0;font-size:1.1em;flex:1;min-width:0}
+.sh-body{overflow:auto;padding:14px 16px calc(18px + env(safe-area-inset-bottom));display:grid;gap:12px}
+.doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px}
+.doc dl{margin:0;display:grid;grid-template-columns:76px 1fr;gap:6px 10px;font-size:.9em}.doc dt{color:var(--ink3)}.doc dd{margin:0;white-space:pre-wrap;word-break:break-all}
+.pad-wrap{position:relative}
+canvas.pad{display:block;width:100%;height:200px;border:1.5px dashed #c9c9c4;border-radius:12px;background:#fff;touch-action:none}
+.pad-hint{position:absolute;inset:0;display:grid;place-items:center;color:#b0b0aa;pointer-events:none;font-size:.92em}
+.msgbox{width:100%;min-height:180px;font-size:15px;background:#fff}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:10px}
+.steps span{font-size:.75em;font-weight:700;text-align:center;padding:5px 2px;border-radius:8px;background:var(--line2);color:var(--ink3)}
+.steps span.done{background:var(--ok-soft);color:var(--ok)}.steps span.now{background:var(--accent);color:#fff}
+.tbl{width:100%;border-collapse:collapse;font-size:.84em}
+.tbl th{text-align:left;color:var(--ink3);font-weight:600;padding:9px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:9px 6px;border-bottom:1px solid var(--line2);vertical-align:top}
+.tbl td small{color:var(--ink3)}
+.tbl .n,.tbl th:nth-child(n+3){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl tfoot td{font-weight:700;border-top:1px solid var(--line);border-bottom:0;background:#fafaf8}
+.tbl tbody tr{cursor:pointer}
+.store-sel{height:40px;font-size:15px}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<div id="layer"></div>
 <script>
 const SB_URL = "https://fqkwokupgcxvcjsbuupb.supabase.co";
 const SB_KEY = "sb_publishable_W0ajtBYOzCg5ZW0vsaagUQ_6_B1OtoR";
-const TK = "menuit_partner_session_v1";
+const TK = "menuit_partner_session_v1", FK = "menuit_partner_filters_v2";
+const PARTS = ["시공", "촬영", "온보딩"];
+const DOC = { 시공: "설치 확인서", 촬영: "촬영 완료 확인서", 온보딩: "온보딩 완료 확인서" };
+const DEFAULT_MSG = {
+  customer_scheduled: "안녕하세요, {매장명} 사장님.\n메뉴잇 {종목} 담당 {파트너}입니다.\n\n방문 일정 안내드립니다.\n· 일시: {방문일} {시간}\n· 주소: {주소}\n· 작업: {작업내용}\n\n일정 변경이 필요하시면 이 번호로 연락 부탁드립니다.\n감사합니다.",
+  customer_done: "안녕하세요, {매장명} 사장님.\n메뉴잇 {종목} 담당 {파트너}입니다.\n\n오늘 {종목} 작업이 완료되었습니다.\n사용 중 불편하신 점은 메뉴잇 고객센터로 연락 주시면 빠르게 도와드리겠습니다.\n\n이용해 주셔서 감사합니다.",
+  customer_sign: "{매장명} 사장님, 메뉴잇 {확인서} 서명 부탁드립니다.\n아래 링크에서 바로 서명하실 수 있어요.\n{서명링크}",
+};
+const MSG_LABEL = { customer_scheduled: "일정 확정 안내", customer_done: "작업 완료 안내", customer_sign: "확인서 서명 요청" };
 
-const S = { token: "", me: null, jobs: [], tab: "todo", busy: false, loadedAt: 0, edits: {} };
+const S = { token: "", me: null, jobs: [], fees: [], setl: [], prof: null, tab: "db", busy: false, loadedAt: 0, edits: {}, f: null };
 const $ = (s) => document.querySelector(s);
 const h = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const kst = (ms = Date.now()) => new Date(ms + 9 * 3600e3).toISOString().slice(0, 10);
 const today = () => kst();
+const addDays = (d, n) => kst(Date.parse(d) + n * 864e5);
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
+const won = (n) => (Number(n) || 0).toLocaleString("ko-KR") + "원";
 const dlabel = (d) => { if (!d) return "날짜 미정"; d = String(d).slice(0, 10); const diff = Math.round((Date.parse(d) - Date.parse(today())) / 864e5);
   const rel = diff === 0 ? "오늘" : diff === 1 ? "내일" : diff === -1 ? "어제" : ""; return `${Number(d.slice(5, 7))}월 ${Number(d.slice(8, 10))}일 (${WD[new Date(Date.parse(d)).getUTCDay()]})${rel ? " · " + rel : ""}`; };
 const store = { get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } }, set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} } };
@@ -106,6 +173,59 @@ async function rpc(fn, args) {
   const t = await r.text(); return t ? JSON.parse(t) : null;
 }
 function toast(msg, bad) { const el = document.createElement("div"); el.className = "toast" + (bad ? " bad" : ""); el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast("복사했어요. 카톡에 붙여넣기 하세요."); return true; }
+  catch { const ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {} ta.remove(); toast(ok ? "복사했어요." : "복사가 안 돼요. 길게 눌러 직접 복사해 주세요.", !ok); return ok; }
+}
+
+/* ───── filters ───── */
+const FDEF = { range: "all", from: "", to: "", part: "", status: "", q: "", store: "" };
+function loadF() { try { const v = JSON.parse(store.get(FK) || "{}"); return { view: v.view || "card", db: { ...FDEF, ...(v.db || {}) }, done: { ...FDEF, range: "month", ...(v.done || {}) }, stat: { ...FDEF, range: "month", ...(v.stat || {}) } }; } catch { return { view: "card", db: { ...FDEF }, done: { ...FDEF, range: "month" }, stat: { ...FDEF, range: "month" } }; } }
+function saveF() { store.set(FK, JSON.stringify(S.f)); }
+function rangeOf(f) {
+  const t = today(), dow = new Date(Date.parse(t)).getUTCDay(), mon = addDays(t, -((dow + 6) % 7)), m = t.slice(0, 7);
+  const prev = new Date(Date.parse(m + "-01") - 864e5).toISOString().slice(0, 7);
+  return { all: ["", ""], today: [t, t], tomorrow: [addDays(t, 1), addDays(t, 1)], week: [mon, addDays(mon, 6)], month: [m + "-01", m + "-31"], prev: [prev + "-01", prev + "-31"], custom: [f.from, f.to] }[f.range] || ["", ""];
+}
+const RANGES = { db: [["all", "전체"], ["today", "오늘"], ["tomorrow", "내일"], ["week", "이번 주"], ["month", "이번 달"], ["custom", "직접"]],
+  done: [["all", "전체"], ["today", "오늘"], ["week", "이번 주"], ["month", "이번 달"], ["prev", "지난 달"], ["custom", "직접"]],
+  stat: [["today", "오늘"], ["week", "이번 주"], ["month", "이번 달"], ["prev", "지난 달"], ["all", "전체"], ["custom", "직접"]] };
+const STATUSES = { db: [["", "전체"], ["배정", "날짜 미정"], ["일정확정", "일정 확정"], ["late", "방문일 지남"]], done: [["", "전체"], ["unsigned", "서명 대기"], ["signed", "서명 완료"], ["claim", "추가정산 요청"]] };
+const doneDate = (j) => (j.completed_at ? kst(Date.parse(j.completed_at)) : "");
+function applyF(list, key, dateOf) {
+  const f = S.f[key], [a, b] = rangeOf(f), q = f.q.trim().toLowerCase(), t = today();
+  return list.filter((j) => {
+    const d = dateOf(j);
+    if ((a || b) && key === "db" && !d && f.range !== "all") return false;
+    if (a && d && d < a) return false; if (b && d && d > b) return false;
+    if ((a || b) && key !== "db" && !d) return false;
+    if (f.part && j.part !== f.part) return false;
+    if (f.store && j.store_name !== f.store) return false;
+    if (f.status === "배정" && j.status !== "배정") return false;
+    if (f.status === "일정확정" && j.status !== "일정확정") return false;
+    if (f.status === "late" && !(j.visit_date && j.visit_date < t)) return false;
+    if (f.status === "unsigned" && j.signed) return false;
+    if (f.status === "signed" && !j.signed) return false;
+    if (f.status === "claim" && !(j.extra_claim > 0)) return false;
+    if (q && ![j.store_name, j.store_address, j.contact_name, j.work_type].join(" ").toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function filterBar(key) {
+  const f = S.f[key], parts = (S.me?.parts?.length ? S.me.parts : PARTS);
+  const active = (f.range !== FDEF.range && key === "db") || f.part || f.status || f.q || f.store;
+  const stores = [...new Set(S.jobs.filter((j) => key === "db" ? j.status !== "완료" : j.status === "완료").map((j) => j.store_name))].sort();
+  return `<div class="fbar">
+    <div class="chips">${RANGES[key].map(([k, l]) => `<button class="chip ${f.range === k ? "on" : ""}" data-f="${key}" data-k="range" data-v="${k}">${l}</button>`).join("")}</div>
+    ${f.range === "custom" ? `<div class="range"><input type="date" id="f_${key}_from" data-fi="${key}" data-k="from" value="${h(f.from)}"><span>~</span><input type="date" id="f_${key}_to" data-fi="${key}" data-k="to" value="${h(f.to)}"></div>` : ""}
+    ${parts.length > 1 ? `<div class="chips">${[["", "전체 종목"], ...parts.map((p) => [p, p])].map(([k, l]) => `<button class="chip sub ${f.part === k ? "on" : ""}" data-f="${key}" data-k="part" data-v="${k}">${l}</button>`).join("")}</div>` : ""}
+    ${STATUSES[key] ? `<div class="chips">${STATUSES[key].map(([k, l]) => `<button class="chip sub ${f.status === k ? "on" : ""}" data-f="${key}" data-k="status" data-v="${k}">${l}</button>`).join("")}</div>` : ""}
+    ${stores.length > 1 ? `<div class="chips">${[["", `매장 전체 ${stores.length}`], ...stores.map((n) => [n, n])].map(([k, l]) => `<button class="chip sub ${f.store === k ? "on" : ""}" data-f="${key}" data-k="store" data-v="${h(k)}">${h(l)}</button>`).join("")}</div>` : ""}
+    ${key !== "stat" ? `<input class="search" type="search" id="f_${key}_q" data-fi="${key}" data-k="q" placeholder="매장명 · 주소 검색" value="${h(f.q)}">` : ""}
+    ${active ? `<div class="fsum"><span>필터 적용 중</span><button data-act="freset" data-v="${key}">초기화</button></div>` : ""}
+  </div>`;
+}
 
 /* ───── login ───── */
 function renderLogin(err = "") {
@@ -126,131 +246,387 @@ function renderLogin(err = "") {
     } catch { renderLogin("연결이 원활하지 않아요. 잠시 후 다시 시도해 주세요."); }
   };
 }
-async function logout() { try { await rpc("partner_logout", { p_token: S.token }); } catch {} S.token = ""; store.set(TK, ""); S.jobs = []; renderLogin(); }
+async function logout() { try { await rpc("partner_logout", { p_token: S.token }); } catch {} S.token = ""; store.set(TK, ""); S.jobs = []; closeSheet(); renderLogin(); }
 
 /* ───── data ───── */
+function authFail() { S.token = ""; store.set(TK, ""); renderLogin("다시 로그인해 주세요."); }
 async function load(first) {
   if (S.busy) return; S.busy = true;
   try {
-    const r = await rpc("partner_jobs", { p_token: S.token });
-    if (!r || !r.ok) { S.token = ""; store.set(TK, ""); return renderLogin(first ? "" : "다시 로그인해 주세요."); }
-    S.me = r.me; S.jobs = r.jobs || []; S.loadedAt = Date.now(); render();
+    const [r, f, st, pr] = await Promise.all([rpc("partner_jobs", { p_token: S.token }), rpc("partner_fees", { p_token: S.token }), rpc("partner_settlements", { p_token: S.token }), rpc("partner_settings_get", { p_token: S.token })]);
+    if (!r || !r.ok) return authFail();
+    S.me = r.me; S.jobs = r.jobs || []; S.fees = (f && f.fees) || []; S.setl = (st && st.items) || []; S.prof = pr && pr.ok ? pr : null; S.loadedAt = Date.now();
+    applyFont(); render();
   } catch { if (first && !S.me) renderLogin("연결이 원활하지 않아요."); else toast("새로고침에 실패했어요. 연결을 확인해 주세요.", true); }
   finally { S.busy = false; }
 }
+function applyFont() { const fs = Number(S.prof?.settings?.fontSize) || 16; document.documentElement.style.setProperty("--fs", fs + "px"); }
 async function save(job, patch, okMsg) {
-  const d = { ...{ visit_date: job.visit_date, visit_time: job.visit_time, status: job.status, partner_note: job.partner_note }, ...patch };
+  const d = { visit_date: job.visit_date, visit_time: job.visit_time, status: job.status, partner_note: job.partner_note, ...patch };
   try {
     const r = await rpc("partner_update_job", { p_token: S.token, p_job: job.id, p_visit_date: d.visit_date || null, p_visit_time: d.visit_time || "", p_status: d.status, p_note: d.partner_note || "" });
-    if (!r || !r.ok) { if (r && r.error === "auth") return renderLogin("다시 로그인해 주세요."); toast("저장하지 못했어요.", true); return; }
-    delete S.edits[job.id]; toast(okMsg); await load();
-  } catch { toast("저장하지 못했어요. 연결을 확인해 주세요.", true); }
+    if (!r || !r.ok) { if (r && r.error === "auth") return authFail(); toast(r && r.error === "locked" ? "서명이 끝났거나 정산이 마감돼 되돌릴 수 없어요." : r && r.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : "저장하지 못했어요.", true); return false; }
+    delete S.edits[job.id]; toast(okMsg); await load(); return true;
+  } catch { toast("저장하지 못했어요. 연결을 확인해 주세요.", true); return false; }
+}
+
+/* ───── messages ───── */
+const signUrl = (j) => new URL("sign.html?t=" + encodeURIComponent(j.sign_token), location.href).href;
+const myMsgs = () => ({ ...DEFAULT_MSG, ...(S.prof?.messages || {}), ...(S.prof?.settings?.messages || {}) });
+function fill(tpl, j) {
+  const v = { 매장명: j.store_name, 종목: j.part, 파트너: S.me?.name || "", 방문일: j.visit_date ? dlabel(j.visit_date).replace(/ · .*/, "") : "(협의 중)", 시간: j.visit_time || "",
+    주소: j.store_address || "", 작업내용: j.work_type || j.work_detail || j.part, 확인서: DOC[j.part] || "확인서", 서명링크: signUrl(j), 담당자: j.contact_name || "", 연락처: j.contact_phone || "" };
+  return String(tpl || "").replace(/\{([^}]+)\}/g, (m, k) => (k in v ? v[k] : m)).replace(/[ \t]+\n/g, "\n");
+}
+const telOf = (p) => String(p || "").replace(/[^0-9+]/g, "");
+function openMsg(j, key) {
+  const text = fill(myMsgs()[key], j), tel = telOf(j.contact_phone);
+  sheet(`${MSG_LABEL[key]} · ${j.store_name}`, `
+    <textarea class="msgbox" id="msgText">${h(text)}</textarea>
+    <p class="vars">보내기 전에 내용을 고쳐도 돼요. 기본 문구는 Settings에서 바꿀 수 있어요.</p>
+    <div class="acts"><button class="btn accent" data-act="msgcopy">카톡용 복사</button>
+    ${tel ? `<a class="btn line" id="smsBtn" href="sms:${h(tel)}?&body=${encodeURIComponent(text)}">문자 보내기</a>` : `<button class="btn line" disabled>연락처 없음</button>`}</div>`);
+  $("#msgText").addEventListener("input", (e) => { const a = $("#smsBtn"); if (a) a.href = `sms:${tel}?&body=${encodeURIComponent(e.target.value)}`; });
+}
+
+/* ───── sheet ───── */
+function sheet(title, body) {
+  $("#layer").innerHTML = `<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-label="${h(title)}"><div class="sh-head"><h3>${h(title)}</h3><button class="icon-btn" data-act="close">닫기</button></div><div class="sh-body">${body}</div></div>`;
+}
+function closeSheet() { $("#layer").innerHTML = ""; }
+
+function openSign(j) {
+  const work = [j.work_type, j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type].filter(Boolean).join(" · ");
+  sheet(DOC[j.part] || "완료 확인서", `<div class="doc">
+      <div style="display:flex;align-items:center;gap:8px"><div class="mark" style="width:30px;height:30px;font-size:14px">M</div><b>MENUIT ${h(DOC[j.part] || "완료 확인서")}</b></div>
+      <dl><dt>매장명</dt><dd>${h(j.store_name)}</dd>${j.store_address ? `<dt>주소</dt><dd>${h(j.store_address)}</dd>` : ""}${work ? `<dt>작업</dt><dd>${h(work)}</dd>` : ""}
+      ${j.work_detail ? `<dt>내용</dt><dd>${h(j.work_detail)}</dd>` : ""}<dt>작업일</dt><dd>${h(dlabel(j.visit_date || doneDate(j) || today()).replace(/ · .*/, ""))}</dd><dt>작업자</dt><dd>${h(S.me?.name || "")}</dd></dl>
+      <div style="font-size:.88em;color:var(--ink2);background:#fafaf8;border-radius:10px;padding:10px">위 매장에 메뉴잇 ${h(j.part)} 작업이 완료되었으며, ${j.part === "촬영" ? "촬영이 정상적으로 진행되었음을" : "장비 설치 상태와 작동을"} 확인했습니다.</div></div>
+    <label>확인자 성함 (매장)<input id="sgName" placeholder="예: 홍길동 (대표)" autocomplete="off" value="${h(j.contact_name || "")}"></label>
+    <div class="pad-wrap"><canvas class="pad" id="pad"></canvas><div class="pad-hint" id="padHint">매장 담당자가 여기에 서명해 주세요</div></div>
+    <div class="err" id="sgErr"></div>
+    <div class="acts"><button class="btn line" data-act="padclear">지우기</button><button class="btn accent" data-act="signsave" data-id="${h(j.id)}">서명 완료</button></div>`);
+  setupPad();
+}
+let PAD = null;
+function setupPad() {
+  const c = $("#pad"), ctx = c.getContext("2d"), hint = $("#padHint"); let drawing = false, last = null;
+  PAD = { dirty: false, clear() { const r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1; c.width = r.width * dpr; c.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineWidth = 2.6; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#111"; ctx.fillStyle = "#111"; this.dirty = false; hint.style.display = ""; }, c };
+  PAD.clear();
+  const pt = (e) => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  c.addEventListener("pointerdown", (e) => { drawing = true; last = pt(e); c.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.arc(last[0], last[1], 1.2, 0, Math.PI * 2); ctx.fill(); PAD.dirty = true; hint.style.display = "none"; });
+  c.addEventListener("pointermove", (e) => { if (!drawing) return; const p = pt(e); ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); last = p; });
+  const end = () => { drawing = false; }; c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
+}
+async function submitSign(j, btn) {
+  const nm = $("#sgName").value.trim(), err = $("#sgErr");
+  if (!nm) { err.textContent = "확인자 성함을 입력해 주세요."; return; }
+  if (!PAD || !PAD.dirty) { err.textContent = "서명란에 서명해 주세요."; return; }
+  const c = PAD.c, out = document.createElement("canvas"), w = 600, hh = Math.round(600 * c.height / c.width); out.width = w; out.height = hh;
+  const o = out.getContext("2d"); o.fillStyle = "#fff"; o.fillRect(0, 0, w, hh); o.drawImage(c, 0, 0, w, hh);
+  btn.disabled = true; btn.textContent = "저장 중…";
+  try {
+    if (j.status !== "완료") { err.textContent = "작업 완료를 먼저 눌러 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
+    const r = await rpc("sign_submit", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png") });
+    if (r && (r.ok || r.error === "already")) { closeSheet(); toast(`${DOC[j.part] || "확인서"} 서명을 받았어요.`); await load(); const nj = S.jobs.find((x) => x.id === j.id); if (nj) openMsg(nj, "customer_done"); return; }
+    err.textContent = "저장하지 못했어요. 다시 시도해 주세요.";
+  } catch { err.textContent = "연결이 원활하지 않아요. 다시 시도해 주세요."; }
+  btn.disabled = false; btn.textContent = "서명 완료";
+}
+
+function openClaim(j) {
+  sheet(`추가 정산 요청 · ${j.store_name}`, `
+    <p class="vars">기본 ${h(j.work_type || j.part)} 비용 외에 추가로 한 작업이 있으면 금액과 내용을 남겨 주세요. 관리자가 확인 후 정산에 반영해요.</p>
+    <label>요청 금액 (원)<input id="clAmt" inputmode="numeric" value="${h(j.extra_claim || "")}" placeholder="예: 30000"></label>
+    <label>내용<textarea id="clNote" placeholder="예: 태블릿 1대 추가 설치, 거치대 교체">${h(j.extra_claim_note || "")}</textarea></label>
+    ${j.extra_fee ? `<p class="vars">현재 반영된 추가 정산: ${won(j.extra_fee)}${j.extra_note ? " · " + h(j.extra_note) : ""}</p>` : ""}
+    <button class="btn accent" data-act="claimsave" data-id="${h(j.id)}">요청 저장</button>`);
+}
+async function saveClaim(j) {
+  const amt = parseInt(String($("#clAmt").value).replace(/[^0-9]/g, ""), 10) || 0, note = $("#clNote").value.trim();
+  if (amt > 0 && !note) return toast("추가 작업 내용을 적어 주세요.", true);
+  try { const r = await rpc("partner_claim_extra", { p_token: S.token, p_job: j.id, p_amount: amt, p_note: note });
+    if (!r || !r.ok) return toast(r && r.error === "locked" ? "이미 마감된 달이라 요청할 수 없어요." : "저장하지 못했어요.", true);
+    closeSheet(); toast(amt ? "추가 정산을 요청했어요." : "요청을 지웠어요."); load();
+  } catch { toast("저장하지 못했어요.", true); }
+}
+
+function openReport(j, kind = "issue") {
+  const tabs = [["issue", "특이사항"], ["contact", "담당자 변경"], ["cancel", "취소 요청"]];
+  sheet(`현장 보고 · ${j.store_name}`, `
+    <div class="chips">${tabs.map(([k, l]) => `<button class="chip ${kind === k ? "on" : ""}" data-act="rtab" data-k="${k}" data-id="${h(j.id)}">${l}</button>`).join("")}</div>
+    ${kind === "contact" ? `<p class="vars">현재: ${h([j.contact_name, j.contact_phone].filter(Boolean).join(" · ") || "없음")}</p>
+      <div class="grid2"><label>새 담당자<input id="rpName" value=""></label><label>연락처<input id="rpPhone" inputmode="tel" value=""></label></div>
+      <label>메모 (선택)<textarea id="rpNote" placeholder="예: 점장님으로 담당 변경"></textarea></label>`
+    : kind === "cancel" ? `<p class="vars">관리자가 확인한 뒤 취소 처리해요. 그 전까지는 목록에 남아 있어요.</p>
+      <label>취소 사유<textarea id="rpNote" placeholder="예: 매장 오픈 연기, 점주 요청으로 취소"></textarea></label>`
+    : `<label>특이사항<textarea id="rpNote" placeholder="예: 벽면 콘크리트라 앵커 필요, 와이파이 공유기 교체 필요"></textarea></label>
+      <p class="vars">추가 비용이 생겼다면 카드의 ‘추가 정산 요청’도 함께 남겨 주세요.</p>`}
+    <button class="btn accent" data-act="rsave" data-k="${kind}" data-id="${h(j.id)}">관리자에게 보고</button>`);
+}
+async function saveReport(j, kind) {
+  const note = ($("#rpNote") || {}).value?.trim() || "", nm = ($("#rpName") || {}).value?.trim() || "", ph = ($("#rpPhone") || {}).value?.trim() || "";
+  if (kind === "contact" && !nm && !ph) return toast("새 담당자 이름이나 연락처를 적어 주세요.", true);
+  if (kind !== "contact" && kind !== "uncancel" && !note) return toast("내용을 적어 주세요.", true);
+  try { const r = await rpc("partner_report", { p_token: S.token, p_job: j.id, p_kind: kind, p_contact_name: nm, p_contact_phone: ph, p_note: note });
+    if (!r || !r.ok) return toast("보고하지 못했어요.", true);
+    closeSheet(); toast({ contact: "담당자를 바꿨어요.", cancel: "취소를 요청했어요.", issue: "특이사항을 보고했어요.", uncancel: "취소 요청을 철회했어요." }[kind]); load();
+  } catch { toast("보고하지 못했어요.", true); }
+}
+
+/* table view: date · time · store · fee · extra · total */
+function tableView(list, dateOf) {
+  const rows = list.slice().sort((a, b) => String(dateOf(a) || "9").localeCompare(String(dateOf(b) || "9")));
+  const tb = rows.reduce((a, j) => a + (j.base_fee || 0), 0), te = rows.reduce((a, j) => a + (j.extra_fee || 0), 0);
+  return `<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r)"><table class="tbl"><thead><tr><th>날짜</th><th>매장</th><th>금액</th><th>추가</th><th>합계</th></tr></thead><tbody>
+    ${rows.map((j) => `<tr data-jump="${h(j.id)}"><td>${h(dateOf(j) ? String(dateOf(j)).slice(5).replace("-", "/") : "미정")}${j.visit_time ? `<br><small>${h(j.visit_time)}</small>` : ""}</td><td><b>${h(j.store_name)}</b><br><small>${h(j.work_type || j.part)}${j.signed ? " · 서명" : ""}</small></td>
+      <td class="n">${(j.base_fee || 0).toLocaleString()}</td><td class="n">${j.extra_fee ? j.extra_fee.toLocaleString() : j.extra_claim ? `<small>요청 ${j.extra_claim.toLocaleString()}</small>` : "-"}</td><td class="n"><b>${feeOf(j).toLocaleString()}</b></td></tr>`).join("")}
+    </tbody><tfoot><tr><td colspan="2">합계 ${rows.length}건</td><td class="n">${tb.toLocaleString()}</td><td class="n">${te.toLocaleString()}</td><td class="n"><b>${(tb + te).toLocaleString()}</b></td></tr></tfoot></table></div>`;
+}
+function viewToggle() {
+  const v = S.f.view || "card";
+  return `<div class="chips" style="justify-content:flex-end;margin-bottom:8px"><button class="chip ${v === "card" ? "on" : ""}" data-act="view" data-v="card">카드</button><button class="chip ${v === "table" ? "on" : ""}" data-act="view" data-v="table">표 (금액)</button></div>`;
 }
 
 /* ───── views ───── */
-const signUrl = (j) => new URL("sign.html?t=" + encodeURIComponent(j.sign_token), location.href).href;
 const mapUrl = (a) => "https://map.naver.com/p/search/" + encodeURIComponent(a);
-const telOf = (p) => String(p || "").replace(/[^0-9+]/g, "");
-const dateOf = (j) => j.visit_date || "";
-
+const feeOf = (j) => (j.base_fee || 0) + (j.extra_fee || 0);
+function feeLine(j) {
+  if (!j.base_fee && !j.extra_fee && !j.work_type) return "";
+  return `<div class="fee"><span>${h(j.work_type || j.part)}${j.qty > 1 ? ` × ${j.qty}` : ""}${j.extra_fee ? `<br><small>추가 ${won(j.extra_fee)}${j.extra_note ? " · " + h(j.extra_note) : ""}</small>` : ""}${j.extra_claim && j.extra_claim !== j.extra_fee ? `<br><small>추가 요청 ${won(j.extra_claim)} (확인 중)</small>` : ""}</span><b>${won(feeOf(j))}</b></div>`;
+}
 function card(j) {
   const done = j.status === "완료", e = S.edits[j.id] || {};
   const vd = e.visit_date ?? j.visit_date ?? "", vt = e.visit_time ?? j.visit_time ?? "";
+  const pill = done ? (j.signed ? `<span class="pill p-서명">서명 완료</span>` : `<span class="pill p-완료">서명 대기</span>`) : `<span class="pill p-${h(j.status)}">${j.status === "배정" ? "날짜 미정" : "일정 확정"}</span>`;
   return `<div class="card" data-id="${h(j.id)}">
-    <div class="card-top"><h3>${h(j.store_name)}</h3><span class="pill part">${h(j.part)}</span><span class="pill p-${h(j.status)}">${h(j.status === "배정" ? "날짜 미정" : j.status)}</span></div>
+    <div class="card-top"><h3>${h(j.store_name)}</h3><span class="pill part">${h(j.part)}</span>${pill}</div>
     <div class="meta">
       ${j.store_address ? `<div class="row"><span class="k">주소</span><span class="v">${h(j.store_address)}</span></div>` : ""}
       ${j.contact_name || j.contact_phone ? `<div class="row"><span class="k">담당</span><span class="v">${h([j.contact_name, j.contact_phone].filter(Boolean).join(" · "))}</span></div>` : ""}
       ${j.tablet_count || j.pos_type ? `<div class="row"><span class="k">장비</span><span class="v">${h([j.tablet_count ? "태블릿 " + j.tablet_count + "대" : "", j.pos_type].filter(Boolean).join(" · "))}</span></div>` : ""}
       ${j.requested_date ? `<div class="row"><span class="k">희망일</span><span class="v">${h(dlabel(j.requested_date))}</span></div>` : ""}
-      ${done && j.completed_at ? `<div class="row"><span class="k">완료</span><span class="v">${h(dlabel(kst(Date.parse(j.completed_at))))}</span></div>` : ""}
+      ${done ? `<div class="row"><span class="k">완료</span><span class="v">${h(dlabel(doneDate(j)))}</span></div>` : ""}
     </div>
+    ${feeLine(j)}
+    ${j.cancel_requested ? `<div class="notice" style="margin:10px 0 0">⛔ 취소 요청함 · ${h(j.cancel_reason)} <button class="chip" data-act="uncancel" style="margin-left:6px">요청 철회</button></div>` : ""}
+    ${j.install_env ? `<div class="work"><b style="font-size:.85em;color:var(--ink3)">설치 환경</b><br>${h(j.install_env)}</div>` : ""}
+    ${j.special_notes ? `<div class="work" style="background:#fff8e1;border-color:#f2d77a"><b style="font-size:.85em;color:#7a5a00">특이사항</b><br>${h(j.special_notes)}</div>` : ""}
     ${j.work_detail ? `<div class="work">${h(j.work_detail)}</div>` : ""}
+    ${(j.reports || []).length ? `<details class="more"><summary>📣 현장 보고 ${j.reports.length}건</summary><div class="mini" style="margin-top:8px">${j.reports.slice().reverse().map((r) => `<div style="display:block"><b style="font-size:.85em">${h({ contact: "담당자 변경", cancel: "취소 요청", issue: "특이사항", uncancel: "취소 철회" }[r.kind] || r.kind)}</b> <small style="color:var(--ink3)">${h(new Date(r.at).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }))}</small><br>${r.kind === "contact" ? h(r.from || "-") + " → " + h(r.to) + "<br>" : ""}${h(r.note)}</div>`).join("")}</div></details>` : ""}
     <div class="links">
       ${j.store_address ? `<a href="${h(mapUrl(j.store_address))}" target="_blank" rel="noopener">🗺️ 길찾기</a>` : ""}
       ${telOf(j.contact_phone) ? `<a class="call" href="tel:${h(telOf(j.contact_phone))}">📞 전화</a>` : ""}
+      <button data-act="msg" data-k="${done ? "customer_done" : "customer_scheduled"}">💬 고객 안내</button>
+      ${j.locked ? "" : `<button data-act="report">📣 현장 보고</button>`}
     </div>
-    ${done ? `` : `<div class="when"><label>방문 날짜<input type="date" data-f="visit_date" value="${h(vd)}"></label><label>시간<input data-f="visit_time" placeholder="예: 14시" value="${h(vt)}"></label></div>`}
-    <details class="more" ${j.partner_note ? "" : ""}><summary>📝 메모 ${j.partner_note ? "· 작성됨" : "남기기"}</summary>
-      <textarea data-f="partner_note" placeholder="현장 특이사항, 추가 작업 등">${h(e.partner_note ?? j.partner_note ?? "")}</textarea>
-      <button class="btn line" style="margin-top:8px;height:42px" data-act="note">메모 저장</button></details>
-    ${j.signed ? `<div class="signed">✅ 설치 확인서 서명 완료${j.sign_name ? " · " + h(j.sign_name) : ""}</div>` : ""}
+    ${(() => { const step = done ? (j.signed ? 4 : 3) : j.status === "일정확정" ? 2 : 1;
+      return `<div class="steps">${["① 날짜 저장", "② 작업 완료", "③ 서명"].map((l, i) => `<span class="${step > i + 1 ? "done" : step === i + 1 ? "now" : ""}">${step > i + 1 ? "✓ " : ""}${l}</span>`).join("")}</div>`; })()}
+    ${done ? "" : `<div class="when"><label>방문 날짜<input type="date" data-e="visit_date" value="${h(vd)}"></label><label>시간<input data-e="visit_time" placeholder="예: 14시" value="${h(vt)}"></label></div>`}
+    <details class="more"><summary>📝 메모 ${j.partner_note ? "· 작성됨" : "남기기"} · 💰 추가 정산${j.extra_claim ? " 요청됨" : ""}</summary>
+      <textarea data-e="partner_note" placeholder="현장 특이사항">${h(e.partner_note ?? j.partner_note ?? "")}</textarea>
+      <div class="acts"><button class="btn line sm" data-act="note">메모 저장</button><button class="btn line sm" data-act="claim">추가 정산 요청</button></div></details>
+    ${j.signed ? `<div class="signed">✅ ${h(DOC[j.part] || "확인서")} 서명 완료${j.sign_name ? " · " + h(j.sign_name) : ""}</div>` : ""}
+    ${j.locked ? `<div class="lock">🔒 ${h(j.settle_month)} 정산 마감됨</div>` : ""}
     <div class="acts">
-      ${done ? `${j.signed ? "" : `<button class="btn accent" data-act="sign">✍️ 서명 받기</button><button class="btn line" data-act="copy">🔗 서명 링크 복사</button>`}
-        <button class="btn line" data-act="undo" style="grid-column:1/-1;height:42px;font-size:14px">완료 취소</button>`
-      : `<button class="btn line" data-act="date">📅 날짜 저장</button><button class="btn ok" data-act="done">✔ 설치 완료</button>`}
+      ${done ? `${j.signed ? "" : `<button class="btn accent" data-act="sign">✍️ 현장 서명 받기</button><button class="btn line" data-act="msg" data-k="customer_sign">🔗 서명 링크 보내기</button>`}
+        ${!j.signed && !j.locked ? `<button class="btn line sm full" data-act="undo">완료 취소</button>` : ""}`
+      : j.status === "일정확정" ? `<button class="btn ok full" data-act="done">✔ 작업 완료</button><button class="btn line sm full" data-act="date">방문 날짜 변경 저장</button>`
+      : `<button class="btn accent full" data-act="date">📅 날짜 저장</button>`}
     </div></div>`;
 }
 
-function render() {
-  const t = today(), jobs = S.jobs;
-  const todo = jobs.filter((j) => j.status !== "완료"), done = jobs.filter((j) => j.status === "완료");
-  const todayN = todo.filter((j) => dateOf(j) === t).length;
-  const head = `<header><div class="hd"><div class="mark">M</div><div><b>${h(S.me?.name || "")} 님</b><small>${h((S.me?.parts || []).join(" · ") || "메뉴잇 파트너")}</small></div>
-    <div class="sp"><button class="icon-btn" data-act="reload">새로고침</button><button class="icon-btn" data-act="logout">로그아웃</button></div></div></header>`;
-  const tabs = `<div class="tabs">${[["todo", "가야 할 곳", todo.length], ["done", "완료", done.length], ["stat", "내 실적", null]].map(([k, l, n]) => `<button class="tab ${S.tab === k ? "on" : ""}" data-tab="${k}">${l}${n !== null ? `<span class="n">${n}</span>` : ""}</button>`).join("")}</div>`;
-  let body = "";
-  if (S.tab === "todo") {
-    if (!todo.length) body = `<div class="empty"><b>배정된 일정이 없어요</b>새 매장이 배정되면 여기에 나타나요.</div>`;
-    else {
-      const undated = todo.filter((j) => !dateOf(j)), dated = todo.filter((j) => dateOf(j)).sort((a, b) => dateOf(a).localeCompare(dateOf(b)));
-      const groups = {}; for (const j of dated) (groups[dateOf(j)] ||= []).push(j);
-      body = (undated.length ? `<div class="day">📌 날짜를 정해 주세요 · ${undated.length}건</div>${undated.map(card).join("")}` : "")
-        + Object.entries(groups).map(([d, list]) => `<div class="day ${d === t ? "today" : ""}">${d < t ? "⚠️ " : ""}${h(dlabel(d))} · ${list.length}건</div>${list.map(card).join("")}`).join("");
-    }
-  } else if (S.tab === "done") {
-    const list = done.slice().sort((a, b) => String(b.completed_at || "").localeCompare(String(a.completed_at || "")));
-    body = list.length ? list.map(card).join("") : `<div class="empty"><b>완료한 건이 아직 없어요</b></div>`;
-  } else {
-    const m = t.slice(0, 7), cd = (j) => (j.completed_at ? kst(Date.parse(j.completed_at)) : "");
-    const doneToday = done.filter((j) => cd(j) === t).length, doneMonth = done.filter((j) => cd(j).startsWith(m)).length;
-    const signedMonth = done.filter((j) => cd(j).startsWith(m) && j.signed).length;
-    const byPart = {}; for (const j of done.filter((j) => cd(j).startsWith(m))) byPart[j.part] = (byPart[j.part] || 0) + 1;
-    const months = {}; for (const j of done) { const k = cd(j).slice(0, 7); if (k) months[k] = (months[k] || 0) + 1; }
-    body = `<div class="stats">
-      <div class="stat hi"><small>오늘 완료</small><b>${doneToday}</b></div>
-      <div class="stat"><small>오늘 남은 일정</small><b>${todayN}</b></div>
-      <div class="stat"><small>${Number(m.slice(5))}월 완료</small><b>${doneMonth}</b></div>
-      <div class="stat"><small>${Number(m.slice(5))}월 서명 완료</small><b>${signedMonth}</b></div></div>
-      ${Object.keys(byPart).length ? `<div class="sub-h">이번 달 종목별</div><div class="mini">${Object.entries(byPart).map(([k, v]) => `<div><span>${h(k)}</span><b>${v}건</b></div>`).join("")}</div>` : ""}
-      ${Object.keys(months).length ? `<div class="sub-h">월별 완료</div><div class="mini">${Object.entries(months).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 6).map(([k, v]) => `<div><span>${Number(k.slice(0, 4))}년 ${Number(k.slice(5))}월</span><b>${v}건</b></div>`).join("")}</div>` : ""}
-      <p class="sync">본인 실적만 표시돼요.</p>`;
-  }
-  $("#app").innerHTML = head + `<div class="wrap">${tabs}${body}<p class="sync">마지막 갱신 ${new Date(S.loadedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}</p></div>`;
+function head() {
+  return `<header><div class="hd"><div class="mark">M</div><div><b>${h(S.me?.name || "")} 님</b><small>${h((S.me?.parts || []).join(" · ") || "메뉴잇 파트너")}</small></div>
+    <div class="sp"><button class="icon-btn" data-act="reload">새로고침</button></div></div></header>`;
+}
+function nav() {
+  const todo = S.jobs.filter((j) => j.status !== "완료").length, unsigned = S.jobs.filter((j) => j.status === "완료" && !j.signed).length, req = S.setl.filter((s) => s.status === "확인요청").length;
+  return `<nav class="tabs"><div class="in">${[["db", "📋", "DB", todo], ["done", "✅", "Done", unsigned], ["stat", "📊", "My Stats", 0], ["setl", "💰", "Settlement", req], ["set", "⚙️", "Settings", 0]]
+    .map(([k, i, l, n]) => `<button class="${S.tab === k ? "on" : ""}" data-tab="${k}"><i>${i}</i>${l}${n ? ` <span class="n">${n}</span>` : ""}</button>`).join("")}</div></nav>`;
 }
 
+function viewDB() {
+  const t = today(), todo = S.jobs.filter((j) => j.status !== "완료");
+  const list = applyF(todo, "db", (j) => j.visit_date || j.requested_date || "");
+  let body = filterBar("db");
+  if (!todo.length) return body + `<div class="empty"><b>배정된 일정이 없어요</b>새 매장이 배정되면 여기에 나타나요.</div>`;
+  if (!list.length) return body + `<div class="empty"><b>조건에 맞는 건이 없어요</b>필터를 바꿔 보세요.</div>`;
+  body += viewToggle();
+  if (S.f.view === "table") return body + tableView(list, (j) => j.visit_date || "");
+  const undated = list.filter((j) => !j.visit_date), dated = list.filter((j) => j.visit_date).sort((a, b) => a.visit_date.localeCompare(b.visit_date));
+  const groups = {}; for (const j of dated) (groups[j.visit_date] ||= []).push(j);
+  return body + (undated.length ? `<div class="day">📌 날짜를 정해 주세요 · ${undated.length}건</div>${undated.map(card).join("")}` : "")
+    + Object.entries(groups).map(([d, l]) => `<div class="day ${d === t ? "today" : d < t ? "late" : ""}">${d < t ? "⚠️ " : ""}${h(dlabel(d))} · ${l.length}건</div>${l.map(card).join("")}`).join("");
+}
+function viewDone() {
+  const done = S.jobs.filter((j) => j.status === "완료"), list = applyF(done, "done", doneDate).sort((a, b) => String(b.completed_at || "").localeCompare(String(a.completed_at || "")));
+  const unsigned = list.filter((j) => !j.signed).length;
+  return filterBar("done") + (unsigned ? `<div class="notice">서명을 아직 못 받은 건이 <b>${unsigned}건</b> 있어요. 현장에서 받거나 서명 링크를 보내 주세요.</div>` : "")
+    + viewToggle() + (list.length ? (S.f.view === "table" ? tableView(list, doneDate) : list.map(card).join("")) : `<div class="empty"><b>${done.length ? "조건에 맞는 건이 없어요" : "완료한 건이 아직 없어요"}</b></div>`);
+}
+function viewStat() {
+  const done = applyF(S.jobs.filter((j) => j.status === "완료"), "stat", doneDate), all = applyF(S.jobs, "stat", (j) => j.visit_date || j.requested_date || doneDate(j));
+  const t = today(), todayLeft = S.jobs.filter((j) => j.status !== "완료" && j.visit_date === t).length;
+  const sum = done.reduce((a, j) => a + feeOf(j), 0), signed = done.filter((j) => j.signed).length;
+  const byPart = {}; for (const j of done) { const k = j.part; byPart[k] ||= { n: 0, fee: 0 }; byPart[k].n++; byPart[k].fee += feeOf(j); }
+  const byType = {}; for (const j of done) { const k = j.work_type || j.part; byType[k] ||= { n: 0, fee: 0 }; byType[k].n++; byType[k].fee += feeOf(j); }
+  const months = {}; for (const j of S.jobs.filter((x) => x.status === "완료")) { const k = (j.settle_month || doneDate(j).slice(0, 7)); if (k) { months[k] ||= { n: 0, fee: 0 }; months[k].n++; months[k].fee += feeOf(j); } }
+  const maxM = Math.max(1, ...Object.values(months).map((m) => m.fee));
+  return filterBar("stat") + `<div class="stats">
+      <div class="stat hi"><small>완료</small><b>${done.length}건</b></div>
+      <div class="stat hi"><small>예상 수수료 (세전)</small><b>${won(sum)}</b></div>
+      <div class="stat"><small>서명 완료</small><b>${signed} / ${done.length}</b></div>
+      <div class="stat"><small>오늘 남은 일정</small><b>${todayLeft}건</b></div></div>
+    ${all.length ? `<div class="sub-h">기간 내 배정 ${all.length}건 · 완료율 ${Math.round(done.length / all.length * 100)}%</div>` : ""}
+    ${Object.keys(byPart).length ? `<div class="sub-h">종목별</div><div class="mini">${Object.entries(byPart).map(([k, v]) => `<div><span>${h(k)} · ${v.n}건</span><b>${won(v.fee)}</b></div>`).join("")}</div>` : ""}
+    ${Object.keys(byType).length ? `<div class="sub-h">작업 유형별</div><div class="mini">${Object.entries(byType).sort((a, b) => b[1].fee - a[1].fee).map(([k, v]) => `<div><span>${h(k)} · ${v.n}건</span><b>${won(v.fee)}</b></div>`).join("")}</div>` : ""}
+    ${Object.keys(months).length ? `<div class="sub-h">월별 (전체 기간)</div><div class="mini">${Object.entries(months).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 12).map(([k, v]) => `<div style="display:block"><div style="display:flex;justify-content:space-between"><span>${Number(k.slice(0, 4))}년 ${Number(k.slice(5))}월 · ${v.n}건</span><b>${won(v.fee)}</b></div><div class="bar"><i style="width:${Math.round(v.fee / maxM * 100)}%"></i></div></div>`).join("")}</div>` : ""}
+    <p class="sync">본인 실적만 표시돼요. 실제 지급액은 Settlement에서 확정돼요.</p>`;
+}
+function viewSetl() {
+  const items = S.setl;
+  const feeTbl = S.fees.length ? PARTS.filter((p) => S.fees.some((f) => f.part === p)).map((p) => `<div class="sub-h">${p} 비용</div><div class="mini">${S.fees.filter((f) => f.part === p).map((f) => `<div><span>${h(f.name)}${f.note ? `<br><small style="color:var(--ink3)">${h(f.note)}</small>` : ""}</span><b>${won(f.amount)}${f.unit && f.unit !== "건" ? ` / ${h(f.unit)}` : ""}</b></div>`).join("")}</div>`).join("")
+    : `<div class="empty" style="padding:24px"><b>등록된 시공비 정책이 아직 없어요</b>관리자가 등록하면 여기에 보여요.</div>`;
+  return `<h2 class="title">월 정산</h2>${items.length ? items.map((s) => {
+      const jobs = S.jobs.filter((j) => j.status === "완료" && j.settle_month === s.month);
+      return `<div class="card"><div class="card-top"><h3>${Number(s.month.slice(0, 4))}년 ${Number(s.month.slice(5))}월</h3><span class="st-badge s-${h(s.status)}">${h(s.status === "확인요청" ? "확인 필요" : s.status)}</span></div>
+        <div class="mini" style="margin-top:10px"><div><span>작업</span><b>${s.job_count}건</b></div><div><span>기본 수수료</span><b>${won(s.base_total)}</b></div><div><span>추가 정산</span><b>${won(s.extra_total)}</b></div>
+        <div><span>합계 (세전)</span><b>${won(s.total)}</b></div><div><span>원천징수 3.3%</span><b>-${won(s.income_tax + s.local_tax)}</b></div><div><span>실지급액</span><b style="color:var(--accent)">${won(s.net)}</b></div></div>
+        <details class="more"><summary>작업 내역 ${jobs.length}건 보기</summary><div class="mini" style="margin-top:8px">${jobs.map((j) => `<div><span>${h(dlabel(doneDate(j)).replace(/ · .*/, ""))} ${h(j.store_name)}<br><small style="color:var(--ink3)">${h(j.work_type || j.part)}${j.extra_fee ? " + 추가 " + won(j.extra_fee) : ""}</small></span><b>${won(feeOf(j))}</b></div>`).join("") || "<div>내역 없음</div>"}</div></details>
+        ${s.status === "확인요청" ? `<label style="margin-top:10px">의견 (이의가 있으면 꼭 적어 주세요)<textarea id="sn_${h(s.month)}" placeholder="예: 10/12 광안 치킨 추가 설치 1대 누락"></textarea></label>
+          <div class="acts"><button class="btn danger" data-act="setlno" data-m="${h(s.month)}">이의 있음</button><button class="btn ok" data-act="setlok" data-m="${h(s.month)}">금액 확인</button></div>`
+        : s.partner_note ? `<p class="lock">내 의견: ${h(s.partner_note)}</p>` : ""}</div>`; }).join("")
+    : `<div class="empty"><b>정산 내역이 아직 없어요</b>월말에 관리자가 마감하면 여기서 금액을 확인해요.</div>`}
+    <h2 class="title">시공비 정책 <small>모든 파트너 공통</small></h2>${feeTbl}`;
+}
+function viewSet() {
+  const p = S.prof || {}, st = p.settings || {}, msgs = myMsgs(), mine = st.messages || {};
+  return `<h2 class="title">Settings</h2>
+    <div class="set-sec"><h3>내 정보</h3>
+      <label>연락처<input id="s_phone" value="${h(p.phone || "")}" inputmode="tel"></label>
+      <label>활동 지역<input id="s_region" value="${h(p.region || "")}" placeholder="예: 부산 동부"></label>
+      <p class="hint">이름과 종목은 관리자만 바꿀 수 있어요. (${h(p.name || "")} · ${h((p.parts || []).join(", "))})</p></div>
+    <div class="set-sec"><h3>지급 계좌</h3>
+      <div class="grid2"><label>은행<input id="s_bank" value="${h(p.bank || "")}"></label><label>예금주<input id="s_holder" value="${h(p.holder || "")}"></label></div>
+      <label>계좌번호<input id="s_account" value="${h(p.account || "")}" inputmode="numeric"></label>
+      <p class="hint">월 정산 지급에 쓰여요. 관리자만 볼 수 있어요.</p></div>
+    <div class="set-sec"><h3>고객 안내 문구</h3>
+      <p class="hint">내가 쓰는 문구로 바꿀 수 있어요. 비워두면 회사 기본 문구를 써요.</p>
+      ${Object.keys(MSG_LABEL).map((k) => `<label>${MSG_LABEL[k]}${mine[k] ? " · 내 문구" : ""}<textarea id="s_msg_${k}" style="min-height:140px">${h(msgs[k])}</textarea></label>`).join("")}
+      <p class="vars">쓸 수 있는 칸: {매장명} {종목} {파트너} {방문일} {시간} {주소} {작업내용} {담당자} {연락처} {확인서} {서명링크}</p>
+      <button class="btn line sm" data-act="msgreset">회사 기본 문구로 되돌리기</button></div>
+    <div class="set-sec"><h3>화면</h3>
+      <label>글자 크기</label><input type="hidden" id="s_font" value="${Number(st.fontSize || 16)}">
+      <div class="chips" data-group="s_font">${[[14, "작게"], [16, "보통"], [18, "크게"], [20, "아주 크게"]].map(([n, l]) => `<button class="chip ${Number(st.fontSize || 16) === n ? "on" : ""}" data-act="pick" data-t="s_font" data-v="${n}">${l}</button>`).join("")}</div>
+      <label>첫 화면 DB 기간</label><input type="hidden" id="s_range" value="${h(st.dbRange || "all")}">
+      <div class="chips" data-group="s_range">${RANGES.db.filter(([k]) => k !== "custom").map(([k, l]) => `<button class="chip ${(st.dbRange || "all") === k ? "on" : ""}" data-act="pick" data-t="s_range" data-v="${k}">${l}</button>`).join("")}</div></div>
+    <button class="btn accent" data-act="setsave">설정 저장</button>
+    <div class="set-sec" style="margin-top:14px"><h3>비밀번호 변경</h3>
+      <label>현재 비밀번호<input id="pw_old" type="password" autocomplete="current-password"></label>
+      <label>새 비밀번호 (6자 이상)<input id="pw_new" type="password" autocomplete="new-password"></label>
+      <button class="btn line sm" data-act="pwsave">비밀번호 바꾸기</button></div>
+    <button class="btn danger" data-act="logout">로그아웃</button>
+    <p class="sync">메뉴잇 파트너 · 마지막 갱신 ${new Date(S.loadedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}</p>`;
+}
+
+function render() {
+  const keep = document.activeElement && document.activeElement.id, pos = keep && document.activeElement.selectionStart;
+  const views = { db: viewDB, done: viewDone, stat: viewStat, setl: viewSetl, set: viewSet };
+  $("#app").innerHTML = head() + `<div class="wrap">${(views[S.tab] || viewDB)()}${S.tab !== "set" ? `<p class="sync">마지막 갱신 ${new Date(S.loadedAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}</p>` : ""}</div>` + nav();
+  if (keep) { const el = document.getElementById(keep); if (el) { el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch {} } }
+}
+
+async function saveSettings() {
+  const p = S.prof || {}, st = { ...(p.settings || {}) }, base = { ...DEFAULT_MSG, ...(p.messages || {}) }, mine = {};
+  for (const k of Object.keys(MSG_LABEL)) { const v = $("#s_msg_" + k).value.trim(); if (v && v !== String(base[k]).trim()) mine[k] = v; }
+  st.messages = mine; st.fontSize = Number($("#s_font").value) || 16; st.dbRange = $("#s_range").value;
+  try {
+    const r = await rpc("partner_settings_save", { p_token: S.token, p_phone: $("#s_phone").value.trim(), p_region: $("#s_region").value.trim(), p_bank: $("#s_bank").value.trim(),
+      p_account: $("#s_account").value.trim(), p_holder: $("#s_holder").value.trim(), p_settings: st });
+    if (!r || !r.ok) return toast("저장하지 못했어요.", true);
+    toast("설정을 저장했어요."); await load();
+  } catch { toast("저장하지 못했어요.", true); }
+}
+async function changePw() {
+  const o = $("#pw_old").value, n = $("#pw_new").value;
+  if (n.length < 6) return toast("새 비밀번호는 6자 이상이에요.", true);
+  try { const r = await rpc("partner_change_password", { p_token: S.token, p_old: o, p_new: n });
+    if (!r || !r.ok) return toast(r && r.error === "bad_old" ? "현재 비밀번호가 맞지 않아요." : "바꾸지 못했어요.", true);
+    $("#pw_old").value = ""; $("#pw_new").value = ""; toast("비밀번호를 바꿨어요. 다른 기기는 로그아웃돼요.");
+  } catch { toast("바꾸지 못했어요.", true); }
+}
+async function respondSetl(month, ok) {
+  const note = ($("#sn_" + CSS.escape(month)) || {}).value || "";
+  if (!ok && !note.trim()) return toast("이의 내용을 적어 주세요.", true);
+  try { const r = await rpc("partner_settlement_respond", { p_token: S.token, p_month: month, p_ok: ok, p_note: note.trim() });
+    if (!r || !r.ok) return toast("처리하지 못했어요. 새로고침 후 다시 시도해 주세요.", true);
+    toast(ok ? "금액을 확인했어요. 지급 절차가 진행돼요." : "이의를 전달했어요."); load();
+  } catch { toast("처리하지 못했어요.", true); }
+}
+
+/* ───── events ───── */
+let qTimer = null;
 document.addEventListener("input", (e) => {
-  const f = e.target.dataset.f, c = e.target.closest(".card"); if (!f || !c) return;
-  (S.edits[c.dataset.id] ||= {})[f] = e.target.value;
+  const t = e.target;
+  if (t.dataset.e) { const c = t.closest(".card"); if (c) (S.edits[c.dataset.id] ||= {})[t.dataset.e] = t.value; return; }
+  if (t.dataset.fi) { S.f[t.dataset.fi][t.dataset.k] = t.value; saveF(); clearTimeout(qTimer); qTimer = setTimeout(render, t.type === "search" ? 250 : 0); }
 });
 document.addEventListener("click", async (e) => {
+  const jr = e.target.closest("[data-jump]"); if (jr) { S.f.view = "card"; saveF(); render(); const el = document.querySelector(`.card[data-id="${jr.dataset.jump}"]`); if (el) el.scrollIntoView({ block: "center" }); return; }
   const tab = e.target.closest("[data-tab]"); if (tab) { S.tab = tab.dataset.tab; render(); scrollTo(0, 0); return; }
+  const fb = e.target.closest("[data-f]"); if (fb) { S.f[fb.dataset.f][fb.dataset.k] = fb.dataset.v; saveF(); render(); return; }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act, c = b.closest(".card"), j = c && S.jobs.find((x) => x.id === c.dataset.id), ed = (j && S.edits[j.id]) || {};
+  if (act === "close") return closeSheet();
   if (act === "reload") return load();
   if (act === "logout") return logout();
+  if (act === "freset") { S.f[b.dataset.v] = { ...FDEF, range: b.dataset.v === "db" ? "all" : "month" }; saveF(); return render(); }
+  if (act === "setsave") return saveSettings();
+  if (act === "pick") { $("#" + b.dataset.t).value = b.dataset.v; b.parentElement.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); if (b.dataset.t === "s_font") document.documentElement.style.setProperty("--fs", b.dataset.v + "px"); return; }
+  if (act === "view") { S.f.view = b.dataset.v; saveF(); return render(); }
+  if (act === "rtab") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) openReport(jj, b.dataset.k); return; }
+  if (act === "rsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) saveReport(jj, b.dataset.k); return; }
+  if (act === "pwsave") return changePw();
+  if (act === "msgreset") { const base = { ...DEFAULT_MSG, ...(S.prof?.messages || {}) }; for (const k of Object.keys(MSG_LABEL)) $("#s_msg_" + k).value = base[k]; return toast("기본 문구를 넣었어요. 저장을 눌러 주세요."); }
+  if (act === "setlok") return respondSetl(b.dataset.m, true);
+  if (act === "setlno") return respondSetl(b.dataset.m, false);
+  if (act === "msgcopy") return copyText($("#msgText").value);
+  if (act === "padclear") return PAD && PAD.clear();
+  if (act === "signsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) submitSign(jj, b); return; }
+  if (act === "claimsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) saveClaim(jj); return; }
   if (!j) return;
+  if (act === "msg") return openMsg({ ...j, visit_date: ed.visit_date ?? j.visit_date, visit_time: ed.visit_time ?? j.visit_time }, b.dataset.k);
+  if (act === "claim") return openClaim(j);
+  if (act === "report") return openReport(j);
+  if (act === "uncancel") return saveReport(j, "uncancel");
   if (act === "date") {
     const vd = ed.visit_date ?? j.visit_date; if (!vd) return toast("방문 날짜를 골라 주세요.", true);
-    return save(j, { visit_date: vd, visit_time: ed.visit_time ?? j.visit_time, status: "일정확정", partner_note: ed.partner_note ?? j.partner_note }, "방문 날짜를 저장했어요.");
+    const ok = await save(j, { visit_date: vd, visit_time: ed.visit_time ?? j.visit_time, status: "일정확정", partner_note: ed.partner_note ?? j.partner_note }, "방문 날짜를 저장했어요.");
+    if (ok) { const nj = S.jobs.find((x) => x.id === j.id); if (nj) openMsg(nj, "customer_scheduled"); }
+    return;
   }
   if (act === "note") return save(j, { partner_note: ed.partner_note ?? j.partner_note, visit_date: ed.visit_date ?? j.visit_date, visit_time: ed.visit_time ?? j.visit_time }, "메모를 저장했어요.");
   if (act === "done") {
-    if (!confirm(`${j.store_name}\n설치 완료로 보고할까요?`)) return;
-    return save(j, { visit_date: ed.visit_date ?? j.visit_date ?? today(), visit_time: ed.visit_time ?? j.visit_time, status: "완료", partner_note: ed.partner_note ?? j.partner_note }, "완료 보고했어요. 이제 서명을 받아 주세요.");
+    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 완료"; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.textContent = "✔ 작업 완료"; } }, 3000); return; }
+    if (j.status !== "일정확정" || !j.visit_date) return toast("방문 날짜를 먼저 저장해 주세요.", true);
+    const ok = await save(j, { visit_date: j.visit_date, visit_time: j.visit_time, status: "완료", partner_note: ed.partner_note ?? j.partner_note }, "완료 보고했어요. 이제 서명을 받아 주세요.");
+    if (ok) { const nj = S.jobs.find((x) => x.id === j.id); if (nj) openSign(nj); }
+    return;
   }
-  if (act === "undo") { if (!confirm("완료를 취소하고 진행 중으로 되돌릴까요?")) return; return save(j, { status: j.visit_date ? "일정확정" : "배정" }, "완료를 취소했어요."); }
-  if (act === "sign") { location.href = signUrl(j) + "&back=1"; return; }
-  if (act === "copy") {
-    const u = signUrl(j);
-    try { if (navigator.share) { await navigator.share({ title: "메뉴잇 설치 확인서", text: `${j.store_name} 설치 확인서 서명 부탁드립니다.`, url: u }); return; } } catch { return; }
-    try { await navigator.clipboard.writeText(u); toast("서명 링크를 복사했어요."); } catch { prompt("아래 링크를 복사해 주세요", u); }
+  if (act === "undo") {
+    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 완료 취소"; return; }
+    return save(j, { status: j.visit_date ? "일정확정" : "배정" }, "완료를 취소했어요.");
   }
+  if (act === "sign") return openSign(j);
 });
+document.addEventListener("change", (e) => { const t = e.target; if (t.dataset.fi && t.tagName === "SELECT") { S.f[t.dataset.fi][t.dataset.k] = t.value; saveF(); render(); } });
 document.addEventListener("visibilitychange", () => { if (!document.hidden && S.token && Date.now() - S.loadedAt > 60e3) load(); });
 
+S.f = loadF();
 S.token = store.get(TK);
-if (S.token) { $("#app").innerHTML = `<div class="login"><p style="color:var(--ink3)">불러오는 중…</p></div>`; load(true); } else renderLogin();
+if (S.token) { $("#app").innerHTML = `<div class="login"><p style="color:var(--ink3)">불러오는 중…</p></div>`; load(true).then(() => { const r = S.prof?.settings?.dbRange; if (r && !store.get(FK)) { S.f.db.range = r; render(); } }); } else renderLogin();
 </script>
 </body>
 </html>
