@@ -219,7 +219,7 @@ canvas.pad{display:block;width:100%;height:210px;border:1.5px dashed #b9bdb5;bor
 const SB_URL = "https://fqkwokupgcxvcjsbuupb.supabase.co";
 const SB_KEY = "sb_publishable_W0ajtBYOzCg5ZW0vsaagUQ_6_B1OtoR";
 const TK = "menuit_partner_session_v1", FK = "menuit_partner_filters_v3", CK = "menuit_partner_check_v1";
-const PARTS = ["시공", "촬영", "온보딩"];
+const PARTS = ["시공", "촬영"];
 const PDEF = {
   "login.title": "메뉴잇 파트너", "login.sub": "배정받은 매장을 확인하고, 현장에서 바로 완료와 서명까지.",
   "nav.db": "DB", "nav.done": "Done", "nav.stat": "My Stats", "nav.setl": "Settlement", "nav.set": "Settings",
@@ -227,7 +227,7 @@ const PDEF = {
   "btn.date": "날짜 저장", "btn.done": "작업 완료", "btn.redate": "방문 날짜 변경 저장", "btn.sign": "현장 서명", "btn.signlink": "서명 링크 보내기",
   "q.map": "길찾기", "q.call": "전화", "q.msg": "고객 안내", "q.report": "현장 보고", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
   "st.배정": "날짜 미정", "st.일정확정": "일정 확정", "st.late": "방문일 지남", "st.완료": "서명 대기", "st.서명": "서명 완료",
-  "doc.시공": "설치 확인서", "doc.촬영": "촬영 완료 확인서", "doc.온보딩": "온보딩 완료 확인서", "title.setl": "월 정산", "title.fees": "비용 정책",
+  "doc.시공": "설치 확인서", "doc.촬영": "촬영 완료 확인서", "title.setl": "월 정산", "title.fees": "비용 정책",
 };
 const UIK = "menuit_partner_ui_v1";
 let UI = {}; try { UI = JSON.parse(localStorage.getItem(UIK) || "{}"); } catch {}
@@ -586,8 +586,9 @@ function viewStat() {
     <p class="foot">본인 실적만 보여요. 실제 지급액은 Settlement에서 확정돼요.</p>`;
 }
 function viewSetl() {
-  const cats = {}; for (const f of S.fees) { const k = `${f.part} · ${f.category || "기본"}`; (cats[k] ||= []).push(f); }
-  const feeTbl = S.fees.length ? `<div class="list fee-tbl">${Object.entries(cats).map(([k, list]) => `<span class="cat">${h(k)}</span>${list.map((f) => `<div><span>${h(f.name)}${f.note ? `<small>${h(f.note)}</small>` : ""}</span><b>${f.amount ? won(f.amount) + (f.unit && f.unit !== "건" ? ` / ${h(f.unit)}` : "") : "실비"}</b></div>`).join("")}`).join("")}</div>`
+  const myParts = S.me?.parts?.length ? S.me.parts : PARTS, myFees = S.fees.filter((f) => myParts.includes(f.part)), multi = new Set(myFees.map((f) => f.part)).size > 1;
+  const cats = {}; for (const f of myFees) { const k = multi ? `${f.part} · ${f.category || "기본"}` : (f.category || "기본"); (cats[k] ||= []).push(f); }
+  const feeTbl = myFees.length ? `<div class="list fee-tbl">${Object.entries(cats).map(([k, list]) => `<span class="cat">${h(k)}</span>${list.map((f) => `<div><span>${h(f.name)}${f.note ? `<small>${h(f.note)}</small>` : ""}</span><b>${f.amount ? won(f.amount) + (f.unit && f.unit !== "건" ? ` / ${h(f.unit)}` : "") : "실비"}</b></div>`).join("")}`).join("")}</div>`
     : `<div class="empty"><b>등록된 시공비 정책이 없어요</b></div>`;
   return `<div class="h2">${h(PL("title.setl"))}</div>${S.setl.length ? S.setl.map((s) => {
       const jobs = S.jobs.filter((j) => j.status === "완료" && j.settle_month === s.month);
