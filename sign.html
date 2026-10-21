@@ -63,7 +63,7 @@ async function init() {
   if (j.signed) return doneView(j.sign_name, j.signed_at);
   if (j.done === false) { doc.innerHTML = `<div class="done"><div class="big">🛠️</div><h2>아직 작업이 끝나지 않았어요</h2><p>작업 완료 후에 서명할 수 있어요.</p>${backLink()}</div>`; return; }
   const work = [j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type || ""].filter(Boolean).join(" · ");
-  doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(({시공:"설치 확인서",촬영:"촬영 완료 확인서",온보딩:"온보딩 완료 확인서"})[j.part]||"완료 확인서")}</h1></div></div>
+  doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(j.doc_title||({시공:"설치 확인서",촬영:"촬영 완료 확인서",온보딩:"온보딩 완료 확인서"})[j.part]||"완료 확인서")}</h1></div></div>
     <dl>
       <div><dt>매장명</dt><dd>${h(j.store_name)}</dd></div>
       ${j.store_address ? `<div><dt>주소</dt><dd>${h(j.store_address)}</dd></div>` : ""}
