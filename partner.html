@@ -210,6 +210,14 @@ canvas.pad{display:block;width:100%;height:210px;border:1.5px dashed #b9bdb5;bor
 .toast.bad{background:var(--alert)}
 .foot{font-size:.76em;color:var(--ink3);text-align:center;margin-top:14px}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+.cf h4{text-align:center;font-size:17px;margin:2px 0 12px;word-break:keep-all}
+.cf h5{font-size:14px;margin:14px 0 6px}
+.cf table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.cf th,.cf td{border:1px solid #d6d6d0;padding:6px 2px;text-align:center;word-break:break-all;vertical-align:middle;color:#151515}
+.cf th{font-weight:700;background:#fff}
+.cf td.v{background:#fbe3d6;text-align:left;padding-left:5px}
+.cf .inst th{background:#fbe3d6;word-break:keep-all}.cf .inst{font-size:11px}.cf .inst th,.cf .inst td{padding:6px 1px}
+.cf .memo{border:1px solid #d6d6d0;min-height:80px;padding:8px;font-size:12.5px;white-space:pre-wrap;word-break:break-all;color:#151515;background:#fff}
 </style>
 </head>
 <body>
@@ -225,7 +233,7 @@ const PDEF = {
   "nav.db": "DB", "nav.done": "Done", "nav.stat": "My Stats", "nav.setl": "Settlement", "nav.set": "Settings",
   "band.today": "곳 오늘", "band.next": "다음 방문", "step.1": "날짜 저장", "step.2": "작업 완료", "step.3": "서명",
   "btn.date": "날짜 저장", "btn.done": "작업 완료", "btn.redate": "방문 날짜 변경 저장", "btn.sign": "현장 서명", "btn.signlink": "서명 링크 보내기",
-  "q.map": "길찾기", "q.call": "전화", "q.msg": "고객 안내", "q.report": "현장 보고", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
+  "q.map": "길찾기", "q.call": "전화", "q.msg": "고객 안내", "q.report": "현장 메모", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
   "st.배정": "날짜 미정", "st.일정확정": "일정 확정", "st.late": "방문일 지남", "st.완료": "서명 대기", "st.서명": "서명 완료",
   "doc.시공": "설치 확인서", "doc.촬영": "촬영 완료 확인서", "title.setl": "월 정산", "title.fees": "비용 정책",
 };
@@ -401,7 +409,28 @@ function sheet(title, body) {
 }
 function closeSheet() { $("#layer").innerHTML = ""; }
 
+const INST_L = ["메뉴잇-포스", "메뉴잇-메뉴", "싱글스테이션", "멀티스테이션", "충전기"], INST_R = ["카드리더기", "공유기", "허브", "프린터", "멀티탭"];
+function installDoc(j) {
+  const it = j.install_items && Object.keys(j.install_items).length ? j.install_items : (j.tablet_count ? { "메뉴잇-메뉴": { qty: j.tablet_count, method: "" } } : {});
+  const q = (k) => (it[k] && it[k].qty) || "", m = (k) => (it[k] && it[k].method) || "", memo = [j.special_notes, j.work_detail].filter(Boolean).join("\n\n");
+  return `<div class="doc cf" style="background:#fff"><h4>${h(DOC.시공 === "설치 확인서" ? "메뉴잇 테이블 오더 시공 확인서" : DOC.시공)}</h4>
+    <h5>1. 매장 정보</h5><table><tr><th>사업자<br>등록번호</th><td class="v">${h(j.biz_no || "")}</td><th>매장명</th><td class="v">${h(j.store_name)}</td><th>매장<br>전화번호</th><td class="v">${h(j.store_phone || j.contact_phone || "")}</td></tr>
+      <tr><th>방문<br>예정일</th><td class="v">${h(j.visit_date || "")}</td><th>대표자</th><td class="v">${h(j.contact_name || "")}</td><th>휴대폰<br>번호</th><td class="v">${h(j.contact_phone || "")}</td></tr>
+      <tr><th>주소</th><td class="v" colspan="5">${h(j.store_address || "")}</td></tr></table>
+    <h5>2. 설치</h5><table class="inst"><colgroup><col style="width:25%"><col style="width:13%"><col style="width:21%"><col style="width:25%"><col style="width:16%"></colgroup><tr><th>구 분</th><th>수 량</th><th>시공방식</th><th>구 분</th><th>수 량</th></tr>
+      ${INST_L.map((k, i) => `<tr><th>${k}</th><td>${h(q(k))}</td><td>${h(m(k))}</td><th>${INST_R[i]}</th><td>${h(q(INST_R[i]))}</td></tr>`).join("")}</table>
+    <h5>3. 특이사항</h5><div class="memo">${h(memo)}</div>
+    <div class="note" style="margin-top:10px">위 매장에 메뉴잇 시공이 완료되었으며, 장비 설치 상태와 작동을 확인했습니다. (작업자: ${h(S.me?.name || "")})</div></div>`;
+}
 function openSign(j) {
+  if (j.part === "시공") {
+    sheet(DOC[j.part] || "시공 확인서", `${installDoc(j)}
+    <label>확인자 성함 (매장)<input id="sgName" placeholder="예: 홍길동 (대표)" autocomplete="off" value="${h(j.contact_name || "")}"></label>
+    <div class="pad-wrap"><canvas class="pad" id="pad"></canvas><div class="pad-hint" id="padHint">매장 담당자가 여기에 서명해 주세요</div></div>
+    <div class="err" id="sgErr" style="color:var(--alert)"></div>
+    <div class="pair"><button class="btn ghost" data-act="padclear">지우기</button><button class="btn brand" data-act="signsave" data-id="${h(j.id)}">서명 완료</button></div>`);
+    return setupPad();
+  }
   const work = [j.work_type, j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type].filter(Boolean).join(" · ");
   sheet(DOC[j.part] || "완료 확인서", `<div class="doc">
       <div class="hd"><div class="logo" style="width:28px;height:28px;font-size:13px">M</div><b>MENUIT ${h(DOC[j.part] || "완료 확인서")}</b></div>
@@ -443,44 +472,42 @@ async function submitSign(j, btn) {
 
 function openClaim(j) {
   const extras = S.fees.filter((f) => f.part === j.part && f.category === "추가");
-  sheet(`추가 정산 요청`, `<p class="muted" style="margin:0">${h(j.store_name)} · 기본 ${h(j.work_type || j.part)} ${won(j.base_fee)}</p>
+  sheet(`추가 정산`, `<p class="muted" style="margin:0">${h(j.store_name)} · 기본 ${h(j.work_type || j.part)} ${won(j.base_fee)}</p>
     ${extras.length ? `<div class="fsec"><b>정책에 있는 추가 항목</b><div class="chips">${extras.map((f) => `<button class="chip" data-act="claimpick" data-amt="${f.amount}" data-name="${h(f.name)}">${h(f.name)}${f.amount ? " +" + won(f.amount) : " (실비)"}</button>`).join("")}</div></div>` : ""}
     <label>요청 금액 (원)<input id="clAmt" inputmode="numeric" value="${h(j.extra_claim || "")}" placeholder="예: 20000"></label>
     <label>내용<textarea id="clNote" placeholder="예: 주말 시공, 편도 120km 톨비 8,400원">${h(j.extra_claim_note || "")}</textarea></label>
     ${j.extra_fee ? `<div class="note"><b>현재 반영된 추가 정산</b>${won(j.extra_fee)}${j.extra_note ? " · " + h(j.extra_note) : ""}</div>` : ""}
-    <button class="btn brand" data-act="claimsave" data-id="${h(j.id)}">관리자에게 요청</button>`);
+    <button class="btn brand" data-act="claimsave" data-id="${h(j.id)}">저장</button>`);
 }
 async function saveClaim(j) {
   const amt = parseInt(String($("#clAmt").value).replace(/[^0-9]/g, ""), 10) || 0, note = $("#clNote").value.trim();
   if (amt > 0 && !note) return toast("추가 작업 내용을 적어 주세요.", true);
   try { const r = await rpc("partner_claim_extra", { p_token: S.token, p_job: j.id, p_amount: amt, p_note: note });
     if (!r || !r.ok) return toast(r && r.error === "locked" ? "이미 마감된 달이라 요청할 수 없어요." : "저장하지 못했어요.", true);
-    closeSheet(); toast(amt ? "추가 정산을 요청했어요." : "요청을 지웠어요."); load();
+    closeSheet(); toast(amt ? "저장했어요." : "지웠어요."); load();
   } catch { toast("저장하지 못했어요.", true); }
 }
 function openReport(j, kind = "issue") {
-  const tabs = [["issue", "특이사항"], ["contact", "담당자 변경"], ["cancel", "취소 요청"]];
-  sheet(`현장 보고`, `<p class="muted" style="margin:0">${h(j.store_name)}</p>
+  const tabs = [["issue", "특이사항"], ["cancel", "취소 요청"]];
+  sheet(PL("q.report"), `<p class="muted" style="margin:0">${h(j.store_name)}</p>
     <div class="seg" style="flex:none">${tabs.map(([k, l]) => `<button class="${kind === k ? "on" : ""}" data-act="rtab" data-k="${k}" data-id="${h(j.id)}">${l}</button>`).join("")}</div>
-    ${kind === "contact" ? `<p class="muted" style="margin:0">현재: ${h([j.contact_name, j.contact_phone].filter(Boolean).join(" · ") || "없음")}</p>
-      <div class="pair"><label>새 담당자<input id="rpName"></label><label>연락처<input id="rpPhone" inputmode="tel"></label></div>
-      <label>메모 (선택)<textarea id="rpNote" placeholder="예: 점장님으로 담당 변경"></textarea></label>`
-    : kind === "cancel" ? `<label>취소 사유<textarea id="rpNote" placeholder="예: 매장 오픈 연기, 점주 요청으로 취소"></textarea></label><p class="muted" style="margin:0">관리자가 확인한 뒤 취소 처리해요. 그 전까지 목록에 남아 있어요.</p>`
-    : `<label>특이사항<textarea id="rpNote" placeholder="예: 벽면 콘크리트라 앵커 필요, 공유기 교체 필요"></textarea></label><p class="muted" style="margin:0">비용이 더 들면 ‘추가 정산 요청’도 함께 남겨 주세요.</p>`}
-    <button class="btn brand" data-act="rsave" data-k="${kind}" data-id="${h(j.id)}">관리자에게 보고</button>`);
+    ${kind === "cancel" ? `<label>취소 사유<textarea id="rpNote" placeholder="예: 매장 오픈 연기, 점주 요청으로 취소"></textarea></label><p class="muted" style="margin:0">확인 후 취소 처리돼요. 그 전까지 목록에 남아 있어요.</p>`
+    : `<label>특이사항<textarea id="rpNote" placeholder="예: 벽면 콘크리트라 앵커 필요, 공유기 교체 필요"></textarea></label><p class="muted" style="margin:0">비용이 더 들면 ‘추가 정산’도 함께 남겨 주세요. 담당자 변경은 본사에서만 할 수 있어요.</p>`}
+    <button class="btn brand" data-act="rsave" data-k="${kind}" data-id="${h(j.id)}">저장</button>`);
 }
 async function saveReport(j, kind) {
-  const note = ($("#rpNote") || {}).value?.trim() || "", nm = ($("#rpName") || {}).value?.trim() || "", ph = ($("#rpPhone") || {}).value?.trim() || "";
-  if (kind === "contact" && !nm && !ph) return toast("새 담당자 이름이나 연락처를 적어 주세요.", true);
-  if (kind !== "contact" && kind !== "uncancel" && !note) return toast("내용을 적어 주세요.", true);
-  try { const r = await rpc("partner_report", { p_token: S.token, p_job: j.id, p_kind: kind, p_contact_name: nm, p_contact_phone: ph, p_note: note });
-    if (!r || !r.ok) return toast("보고하지 못했어요.", true);
-    closeSheet(); toast({ contact: "담당자를 바꿨어요.", cancel: "취소를 요청했어요.", issue: "특이사항을 보고했어요.", uncancel: "취소 요청을 철회했어요." }[kind]); load();
-  } catch { toast("보고하지 못했어요.", true); }
+  if (kind === "contact") return;
+  const note = ($("#rpNote") || {}).value?.trim() || "";
+  if (kind !== "uncancel" && !note) return toast("내용을 적어 주세요.", true);
+  try { const r = await rpc("partner_report", { p_token: S.token, p_job: j.id, p_kind: kind, p_contact_name: "", p_contact_phone: "", p_note: note });
+    if (!r || !r.ok) return toast("저장하지 못했어요.", true);
+    closeSheet(); toast({ cancel: "취소 요청을 저장했어요.", issue: "저장했어요.", uncancel: "취소 요청을 철회했어요." }[kind]); load();
+  } catch { toast("저장하지 못했어요.", true); }
 }
 
 /* ───── ticket ───── */
 const mapUrl = (a) => "https://map.naver.com/p/search/" + encodeURIComponent(a);
+const instLine = (j) => Object.entries(j.install_items || {}).filter(([, v]) => v && (v.qty || v.method)).map(([k, v]) => `${k} ${v.qty || ""}${v.method ? "(" + v.method + ")" : ""}`.trim()).join(" · ");
 const feeOf = (j) => (j.base_fee || 0) + (j.extra_fee || 0);
 let CHK = {}; try { CHK = JSON.parse(store.get(CK) || "{}"); } catch {}
 function checklist(j) {
@@ -509,6 +536,7 @@ function ticket(j) {
         ${done ? `<div class="r"><span class="k">완료</span><span class="v">${h(dlabel(doneDate(j)))}</span></div>` : ""}
       </div>
       ${j.cancel_requested ? `<div class="note cx"><b>취소 요청함</b>${h(j.cancel_reason)}<div style="margin-top:6px"><button class="chip" data-act="uncancel">요청 철회</button></div></div>` : ""}
+      ${instLine(j) ? `<div class="note env"><b>설치 품목</b>${h(instLine(j))}</div>` : ""}
       ${j.install_env ? `<div class="note env"><b>${h(PL("note.env"))}</b>${h(j.install_env)}</div>` : ""}
       ${j.special_notes ? `<div class="note sp"><b>${h(PL("note.sp"))}</b>${h(j.special_notes)}</div>` : ""}
       ${j.work_detail ? `<div class="note"><b>${h(PL("note.req"))}</b>${h(j.work_detail)}</div>` : ""}

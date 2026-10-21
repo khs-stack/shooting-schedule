@@ -13,7 +13,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
 button,input{font:inherit;color:inherit}
-.wrap{max-width:560px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
+.wrap{max-width:760px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
 .doc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px}
 .brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .mark{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
@@ -35,10 +35,20 @@ canvas{display:block;width:100%;height:200px;border:1.5px dashed #c9c9c4;border-
 .done{text-align:center;padding:24px 8px}.done .big{font-size:44px}.done h2{margin:6px 0 4px}.done p{color:var(--ink3);margin:0}
 .back{display:inline-block;margin-top:16px;color:var(--ink2);font-size:15px}
 .foot{text-align:center;color:var(--ink3);font-size:12.5px;margin-top:14px}
+.cf h1{text-align:center;font-size:21px;margin:4px 0 18px;letter-spacing:.04em;word-break:keep-all}
+.cf h2{font-size:16px;margin:20px 0 8px}
+.cf table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
+.cf th,.cf td{border:1px solid #d6d6d0;padding:8px 4px;text-align:center;word-break:break-all;vertical-align:middle}
+.cf th{font-weight:700;background:#fff}
+.cf td.v{background:#fbe3d6;text-align:left;padding-left:8px}
+.cf .inst th{background:#fbe3d6}.cf .inst thead th{background:#fbe3d6}.cf .inst td{background:#fff}
+.cf .memo{border:1px solid #d6d6d0;min-height:120px;padding:10px;font-size:13.5px;white-space:pre-wrap;word-break:break-all}
+.cf .mob{display:none}
+@media (max-width:520px){.cf .desk{display:none}.cf .mob{display:table}.cf .mob th{width:32%}.cf table{font-size:12.5px}.cf th{word-break:keep-all}.cf .inst{font-size:11.5px}.cf .inst th,.cf .inst td{padding:7px 1px}.cf th,.cf td{padding:7px 3px}.cf td.v{padding-left:8px}}
 </style>
 </head>
 <body>
-<div class="wrap"><div class="doc" id="doc"><p style="color:var(--ink3)">불러오는 중…</p></div><p class="foot">메뉴잇 · 설치 확인서</p></div>
+<div class="wrap"><div class="doc" id="doc"><p style="color:var(--ink3)">불러오는 중…</p></div><p class="foot">주식회사 메뉴잇</p></div>
 <script>
 const SB_URL = "https://fqkwokupgcxvcjsbuupb.supabase.co";
 const SB_KEY = "sb_publishable_W0ajtBYOzCg5ZW0vsaagUQ_6_B1OtoR";
@@ -62,6 +72,7 @@ async function init() {
   if (!j || !j.ok) { doc.innerHTML = `<div class="done"><div class="big">⚠️</div><h2>확인서를 찾을 수 없어요</h2><p>담당자에게 링크를 다시 받아 주세요.</p>${backLink()}</div>`; return; }
   if (j.signed) return doneView(j.sign_name, j.signed_at);
   if (j.done === false) { doc.innerHTML = `<div class="done"><div class="big">🛠️</div><h2>아직 작업이 끝나지 않았어요</h2><p>작업 완료 후에 서명할 수 있어요.</p>${backLink()}</div>`; return; }
+  if (j.part === "시공") return installForm(j);
   const work = [j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type || ""].filter(Boolean).join(" · ");
   doc.innerHTML = `<div class="brand"><div class="mark">M</div><div><b>MENUIT</b><h1>${h(j.doc_title||({시공:"설치 확인서",촬영:"촬영 완료 확인서"})[j.part]||"완료 확인서")}</h1></div></div>
     <dl>
@@ -79,6 +90,33 @@ async function init() {
     <div class="err" id="err"></div>
     <div class="row"><button class="btn line" id="clr">지우기</button><button class="btn accent" id="ok">서명 완료</button></div>
     ${backLink()}`;
+  setupPad();
+}
+
+const INST_L = ["메뉴잇-포스", "메뉴잇-메뉴", "싱글스테이션", "멀티스테이션", "충전기"], INST_R = ["카드리더기", "공유기", "허브", "프린터", "멀티탭"];
+function installForm(j) {
+  const it = j.install_items && Object.keys(j.install_items).length ? j.install_items : (j.tablet_count ? { "메뉴잇-메뉴": { qty: j.tablet_count, method: "" } } : {});
+  const q = (k) => (it[k] && it[k].qty) || "", m = (k) => (it[k] && it[k].method) || "";
+  const memo = [j.special_notes, j.work_detail].filter(Boolean).join("\n\n");
+  doc.innerHTML = `<div class="cf"><h1>${h(j.doc_title || "메뉴잇 테이블 오더 시공 확인서")}</h1>
+    <h2>1. 매장 정보</h2>
+    <table class="mob">${[["사업자등록번호", j.biz_no], ["매장명", j.store_name], ["매장전화번호", j.store_phone || j.contact_phone], ["방문 예정일", j.visit_date], ["대표자", j.contact_name], ["휴대폰번호", j.contact_phone], ["주소", j.store_address]].map(([k, v]) => `<tr><th>${k}</th><td class="v">${h(v || "")}</td></tr>`).join("")}</table>
+    <table class="desk"><colgroup><col style="width:17%"><col style="width:16%"><col style="width:17%"><col style="width:16%"><col style="width:17%"><col style="width:17%"></colgroup>
+      <tr><th>사업자등록번호</th><td class="v">${h(j.biz_no || "")}</td><th>매장명</th><td class="v">${h(j.store_name)}</td><th>매장전화번호</th><td class="v">${h(j.store_phone || j.contact_phone || "")}</td></tr>
+      <tr><th>방문 예정일</th><td class="v">${h(j.visit_date || "")}</td><th>대표자</th><td class="v">${h(j.contact_name || "")}</td><th>휴대폰번호</th><td class="v">${h(j.contact_phone || "")}</td></tr>
+      <tr><th>주소</th><td class="v" colspan="5">${h(j.store_address || "")}</td></tr></table>
+    <h2>2. 설치</h2>
+    <table class="inst"><colgroup><col style="width:25%"><col style="width:13%"><col style="width:21%"><col style="width:25%"><col style="width:16%"></colgroup><thead><tr><th>구 분</th><th>수 량</th><th>시공방식</th><th>구 분</th><th>수 량</th></tr></thead><tbody>
+      ${INST_L.map((k, i) => `<tr><th>${k}</th><td>${h(q(k))}</td><td>${h(m(k))}</td><th>${INST_R[i]}</th><td>${h(q(INST_R[i]))}</td></tr>`).join("")}</tbody></table>
+    <h2>3. 특이사항</h2><div class="memo">${h(memo)}</div></div>
+    <div class="confirm">위 매장에 메뉴잇 시공이 완료되었으며, 장비 설치 상태와 작동을 확인했습니다.${j.partner ? ` (작업자: ${h(j.partner)})` : ""}</div>
+    <label>확인자 성함<input id="nm" placeholder="예: 홍길동 (대표)" autocomplete="name"></label>
+    <label>서명</label>
+    <div class="pad-wrap"><canvas id="pad"></canvas><div class="hint" id="hint">여기에 손가락으로 서명해 주세요</div></div>
+    <div class="err" id="err"></div>
+    <div class="row"><button class="btn line" id="clr">지우기</button><button class="btn accent" id="ok">서명 완료</button></div>
+    ${backLink()}`;
+  document.title = j.doc_title || "메뉴잇 테이블 오더 시공 확인서";
   setupPad();
 }
 
