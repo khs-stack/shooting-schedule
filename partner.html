@@ -18,6 +18,7 @@
   --brand:#f26b1d; --brand-soft:#fff0e6; --go:#157a52; --go-soft:#e2f3ea; --sky:#2563c9; --sky-soft:#e7effb;
   --amber:#a86400; --amber-soft:#fdf1d8; --alert:#c8302a; --alert-soft:#fbe9e7;
   --r:16px; --fs:16px;
+  --band:#1b2029; --band-ink:#ffffff; --band-sub:#a9afb8; --band-line:#3a414d; --band-field:#262c37;
   --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -30,21 +31,21 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .wrap{max-width:620px;margin:0 auto;padding:0 16px calc(100px + env(safe-area-inset-bottom))}
 
 /* today band */
-.band{background:var(--ink);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 0 22px;border-radius:0 0 26px 26px}
+.band{background:var(--band);color:var(--band-ink);padding:calc(14px + env(safe-area-inset-top)) 0 22px;border-radius:0 0 26px 26px}
 .band .in{max-width:620px;margin:0 auto;padding:0 16px}
 .band .top{display:flex;align-items:center;gap:10px}
 .logo{width:32px;height:32px;border-radius:9px;background:var(--brand);display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;flex:none}
-.band .who{min-width:0}.band .who b{display:block;font-size:1.02em}.band .who small{color:#a9afb8;font-size:.8em}
-.band .rf{margin-left:auto;width:38px;height:38px;border-radius:12px;border:1px solid #3a414d;background:transparent;color:#fff;display:grid;place-items:center}
+.band .who{min-width:0}.band .who b{display:block;font-size:1.02em}.band .who small{color:var(--band-sub);font-size:.8em}
+.band .rf{margin-left:auto;width:38px;height:38px;border-radius:12px;border:1px solid var(--band-line);background:transparent;color:var(--band-ink);display:grid;place-items:center}
 .today{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:end}
 .today .big{font-size:3.4em;font-weight:800;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
-.today .big small{font-size:.32em;font-weight:600;color:#a9afb8;margin-left:4px;letter-spacing:0}
-.today .next{border-left:1px solid #3a414d;padding-left:14px;min-width:0}
-.today .next span{display:block;font-size:.78em;color:#a9afb8}
+.today .big small{font-size:.32em;font-weight:600;color:var(--band-sub);margin-left:4px;letter-spacing:0}
+.today .next{border-left:1px solid var(--band-line);padding-left:14px;min-width:0}
+.today .next span{display:block;font-size:.78em;color:var(--band-sub)}
 .today .next b{display:block;font-size:1.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .today .next em{font-style:normal;color:var(--brand);font-weight:700}
-.mini-stats{display:flex;gap:18px;margin-top:16px;font-size:.82em;color:#a9afb8;flex-wrap:wrap}
-.mini-stats b{color:#fff;font-size:1.1em;margin-left:4px;font-variant-numeric:tabular-nums}
+.mini-stats{display:flex;gap:18px;margin-top:16px;font-size:.82em;color:var(--band-sub);flex-wrap:wrap}
+.mini-stats b{color:var(--band-ink);font-size:1.1em;margin-left:4px;font-variant-numeric:tabular-nums}
 
 /* toolbar */
 .bar{position:sticky;top:0;z-index:5;background:var(--paper);padding:12px 0 10px;display:flex;gap:8px;align-items:center}
@@ -147,8 +148,8 @@ details.fold > div{margin-top:10px;display:grid;gap:8px}
 .kpi div{background:var(--card);border-radius:var(--r);padding:14px 16px}
 .kpi span{font-size:.78em;color:var(--ink3);font-weight:600}
 .kpi b{display:block;font-size:1.6em;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.kpi .hero{grid-column:1/-1;background:var(--ink);color:#fff}
-.kpi .hero span{color:#a9afb8}.kpi .hero b{font-size:2.2em}
+.kpi .hero{grid-column:1/-1;background:var(--band);color:var(--band-ink);border:1px solid var(--line)}
+.kpi .hero span{color:var(--band-sub)}.kpi .hero b{font-size:2.2em}
 .list{background:var(--card);border-radius:var(--r);overflow:hidden}
 .list > div{display:flex;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line2);font-size:.9em}
 .list > div:last-child{border-bottom:0}
@@ -184,10 +185,10 @@ nav.tabs button.on svg{stroke:var(--brand)}
 nav.tabs .n{position:absolute;top:2px;left:calc(50% + 6px);min-width:17px;height:17px;border-radius:9px;background:var(--brand);color:#fff;font-size:10px;display:grid;place-items:center;padding:0 4px}
 
 /* login */
-.login{min-height:100vh;display:grid;align-content:center;padding:24px 16px;background:var(--ink)}
+.login{min-height:100vh;display:grid;align-content:center;padding:24px 16px;background:var(--band)}
 .login form{width:100%;max-width:380px;margin:0 auto;display:grid;gap:14px}
-.login h1{margin:14px 0 0;font-size:1.7em;color:#fff;letter-spacing:-.03em}.login p{margin:0;color:#a9afb8;font-size:.9em}
-.login label{color:#a9afb8}.login input{background:#262c37;border-color:#3a414d;color:#fff}
+.login h1{margin:14px 0 0;font-size:1.7em;color:var(--band-ink);letter-spacing:-.03em}.login p{margin:0;color:var(--band-sub);font-size:.9em}
+.login label{color:var(--band-sub)}.login input{background:var(--band-field);border-color:var(--band-line);color:var(--band-ink)}
 .err{color:#ff9a8f;font-size:.88em;min-height:20px}
 
 /* sheet */
@@ -218,6 +219,11 @@ canvas.pad{display:block;width:100%;height:210px;border:1.5px dashed #b9bdb5;bor
 .cf td.v{background:#fbe3d6;text-align:left;padding-left:5px}
 .cf .inst th{background:#fbe3d6;word-break:keep-all}.cf .inst{font-size:11px}.cf .inst th,.cf .inst td{padding:6px 1px}
 .cf .memo{border:1px solid #d6d6d0;min-height:80px;padding:8px;font-size:12.5px;white-space:pre-wrap;word-break:break-all;color:#151515;background:#fff}
+html[data-band="light"]{--band:#ffffff;--band-ink:#1b2029;--band-sub:#6f7680;--band-line:#e2e5df;--band-field:#f4f5f2}
+html[data-band="light"] .band{border-bottom:1px solid var(--line);box-shadow:0 10px 24px -20px rgba(20,25,35,.35)}
+html[data-band="brand"]{--band:var(--brand);--band-ink:#ffffff;--band-sub:rgba(255,255,255,.82);--band-line:rgba(255,255,255,.35);--band-field:rgba(255,255,255,.16)}
+html[data-band="brand"] .band .logo,html[data-band="brand"] .login .logo{background:#fff;color:var(--brand)}
+html[data-band="brand"] .login .btn.brand{background:#fff;color:var(--brand)}
 </style>
 </head>
 <body>
@@ -374,7 +380,14 @@ async function load(first) {
   } catch { if (first && !S.me) renderLogin("연결이 원활하지 않아요."); else toast("새로고침에 실패했어요. 연결을 확인해 주세요.", true); }
   finally { S.busy = false; }
 }
-function applyFont() { const fs = Number(S.prof?.settings?.fontSize) || 16; document.documentElement.style.setProperty("--fs", fs + "px"); }
+function applyFont() { const fs = Number(S.prof?.settings?.fontSize) || 16; document.documentElement.style.setProperty("--fs", fs + "px"); applyDesign(); }
+function applyDesign(over) {
+  const d = UI.design || {}, mine = S.prof?.settings || {}, band = over || mine.band || d.band || "dark", el = document.documentElement;
+  el.dataset.band = ["light", "brand"].includes(band) ? band : "dark";
+  if (/^#[0-9a-f]{6}$/i.test(d.accent || "")) { el.style.setProperty("--brand", d.accent); el.style.setProperty("--brand-soft", `color-mix(in srgb, ${d.accent} 12%, white)`); }
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = el.dataset.band === "light" ? "#ffffff" : el.dataset.band === "brand" ? (d.accent || "#f26b1d") : "#1b2029";
+}
+applyDesign();
 async function save(job, patch, okMsg) {
   const d = { visit_date: job.visit_date, visit_time: job.visit_time, status: job.status, partner_note: job.partner_note, ...patch };
   try {
@@ -650,6 +663,8 @@ function viewSet() {
     <section class="set"><h3>화면</h3>
       <label>글자 크기</label><input type="hidden" id="s_font" value="${Number(st.fontSize || 16)}">
       <div class="chips">${[[14, "작게"], [16, "보통"], [18, "크게"], [20, "아주 크게"]].map(([n, l]) => `<button class="chip ${Number(st.fontSize || 16) === n ? "on" : ""}" data-act="pick" data-t="s_font" data-v="${n}">${l}</button>`).join("")}</div>
+      <label>위쪽 패널 색</label><input type="hidden" id="s_band" value="${h(st.band || "")}">
+      <div class="chips">${[["", "회사 기본"], ["dark", "다크"], ["light", "라이트"], ["brand", "포인트 색"]].map(([k, l]) => `<button class="chip ${(st.band || "") === k ? "on" : ""}" data-act="pick" data-t="s_band" data-v="${k}">${l}</button>`).join("")}</div>
       <label>DB 첫 화면 기간</label><input type="hidden" id="s_range" value="${h(st.dbRange || "all")}">
       <div class="chips">${RANGES.db.filter(([k]) => k !== "custom").map(([k, l]) => `<button class="chip ${(st.dbRange || "all") === k ? "on" : ""}" data-act="pick" data-t="s_range" data-v="${k}">${l}</button>`).join("")}</div></section>
     <button class="btn brand" data-act="setsave">설정 저장</button>
@@ -675,7 +690,7 @@ function render() {
 async function saveSettings() {
   const p = S.prof || {}, st = { ...(p.settings || {}) }, part = (p.parts || [])[0] || "시공", co = p.messages || {}, mine = {};
   for (const k of Object.keys(MSG_LABEL)) { const v = $("#s_msg_" + k).value.trim(), base = String(co[k + "__" + part] || co[k] || DEFAULT_MSG[k]).trim(); if (v && v !== base) mine[k] = v; }
-  st.messages = mine; st.fontSize = Number($("#s_font").value) || 16; st.dbRange = $("#s_range").value;
+  st.messages = mine; st.fontSize = Number($("#s_font").value) || 16; st.band = $("#s_band").value; st.dbRange = $("#s_range").value;
   try {
     const r = await rpc("partner_settings_save", { p_token: S.token, p_phone: $("#s_phone").value.trim(), p_region: $("#s_region").value.trim(), p_bank: $("#s_bank").value.trim(),
       p_account: $("#s_account").value.trim(), p_holder: $("#s_holder").value.trim(), p_settings: st });
@@ -725,7 +740,7 @@ document.addEventListener("click", async (e) => {
   if (act === "freset") { const k = b.dataset.v; S.f[k] = { ...FDEF, range: S.f[k].range }; saveF(); render(); return openFilter(k); }
   if (act === "setsave") return saveSettings();
   if (act === "pwsave") return changePw();
-  if (act === "pick") { $("#" + b.dataset.t).value = b.dataset.v; b.parentElement.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); if (b.dataset.t === "s_font") document.documentElement.style.setProperty("--fs", b.dataset.v + "px"); return; }
+  if (act === "pick") { $("#" + b.dataset.t).value = b.dataset.v; b.parentElement.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); if (b.dataset.t === "s_font") document.documentElement.style.setProperty("--fs", b.dataset.v + "px"); if (b.dataset.t === "s_band") applyDesign(b.dataset.v || (UI.design || {}).band || "dark"); return; }
   if (act === "view") { S.f.view = b.dataset.v; saveF(); return render(); }
   if (act === "rtab") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) openReport(jj, b.dataset.k); return; }
   if (act === "rsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) saveReport(jj, b.dataset.k); return; }
@@ -766,7 +781,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && S.
 
 S.f = loadF();
 S.token = store.get(TK);
-if (S.token) { $("#app").innerHTML = `<div class="login"><p style="color:#a9afb8;text-align:center">불러오는 중…</p></div>`; load(true); } else renderLogin();
+if (S.token) { $("#app").innerHTML = `<div class="login"><p style="color:var(--band-sub);text-align:center">불러오는 중…</p></div>`; load(true); } else renderLogin();
 </script>
 </body>
 </html>
