@@ -238,7 +238,7 @@ const PDEF = {
   "login.title": "메뉴잇 파트너", "login.sub": "배정받은 매장을 확인하고, 현장에서 바로 완료와 서명까지.",
   "nav.db": "DB", "nav.done": "Done", "nav.stat": "My Stats", "nav.setl": "Settlement", "nav.set": "Settings",
   "band.today": "곳 오늘", "band.next": "다음 방문", "step.1": "날짜 저장", "step.2": "작업 완료", "step.3": "서명",
-  "btn.date": "날짜 저장", "btn.done": "작업 완료", "btn.redate": "방문 날짜 변경 저장", "btn.sign": "현장 서명", "btn.signlink": "서명 링크 보내기",
+  "btn.date": "날짜 저장", "btn.done": "확인서 받고 완료", "btn.redate": "방문 날짜 변경 저장", "btn.sign": "현장 서명", "btn.signlink": "서명 링크 보내기",
   "q.map": "길찾기", "q.call": "전화", "q.msg": "고객 안내", "q.report": "현장 메모", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
   "st.배정": "날짜 미정", "st.일정확정": "일정 확정", "st.late": "방문일 지남", "st.완료": "서명 대기", "st.서명": "서명 완료",
   "doc.시공": "설치 확인서", "doc.촬영": "촬영 완료 확인서", "title.setl": "월 정산", "title.fees": "비용 정책",
@@ -469,15 +469,20 @@ function setupPad() {
 }
 async function submitSign(j, btn) {
   const nm = $("#sgName").value.trim(), err = $("#sgErr");
-  if (j.status !== "완료") { err.textContent = "작업 완료를 먼저 눌러 주세요."; return; }
+  if (j.status !== "완료" && !(j.status === "일정확정" && j.visit_date)) { err.textContent = "방문 날짜를 먼저 저장해 주세요."; return; }
   if (!nm) { err.textContent = "확인자 성함을 입력해 주세요."; return; }
   if (!PAD || !PAD.dirty) { err.textContent = "서명란에 서명해 주세요."; return; }
   const c = PAD.c, out = document.createElement("canvas"), w = 600, hh = Math.round(600 * c.height / c.width); out.width = w; out.height = hh;
   const o = out.getContext("2d"); o.fillStyle = "#fff"; o.fillRect(0, 0, w, hh); o.drawImage(c, 0, 0, w, hh);
   btn.disabled = true; btn.textContent = "저장 중…";
   try {
+    if (j.status !== "완료") {
+      const u = await rpc("partner_update_job", { p_token: S.token, p_job: j.id, p_visit_date: j.visit_date, p_visit_time: j.visit_time || "", p_status: "완료", p_note: (S.edits[j.id] || {}).partner_note ?? j.partner_note ?? "" });
+      if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
+      j.status = "완료";
+    }
     const r = await rpc("sign_submit", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png") });
-    if (r && (r.ok || r.error === "already")) { closeSheet(); toast(`${DOC[j.part] || "확인서"} 서명을 받았어요.`); await load(); const nj = S.jobs.find((x) => x.id === j.id); if (nj) openMsg(nj, "customer_done"); return; }
+    if (r && (r.ok || r.error === "already")) { closeSheet(); toast(`${DOC[j.part] || "확인서"} 서명 받고 완료했어요.`); await load(); const nj = S.jobs.find((x) => x.id === j.id); if (nj) openMsg(nj, "customer_done"); return; }
     err.textContent = r && r.error === "not_done" ? "작업 완료를 먼저 눌러 주세요." : "저장하지 못했어요. 다시 시도해 주세요.";
   } catch { err.textContent = "연결이 원활하지 않아요. 다시 시도해 주세요."; }
   btn.disabled = false; btn.textContent = "서명 완료";
@@ -563,7 +568,7 @@ function ticket(j) {
       ${done ? "" : `<div class="when"><label>방문 날짜<input type="date" data-e="visit_date" value="${h(vd)}"></label><label>시간<input data-e="visit_time" placeholder="14시" value="${h(vt)}"></label></div>`}
       ${step === 1 ? `<button class="btn brand" data-act="date">${ic("cal")}${h(PL("btn.date"))}</button>`
       : step === 2 ? `<button class="btn go" data-act="done">${ic("check")}${h(PL("btn.done"))}</button><button class="btn ghost" data-act="date">${h(PL("btn.redate"))}</button>`
-      : step === 3 ? `<div class="pair"><button class="btn brand" data-act="sign">${ic("pen")}${h(PL("btn.sign"))}</button><button class="btn" data-act="msg" data-k="customer_sign">${h(PL("btn.signlink"))}</button></div>${!j.locked ? `<button class="btn ghost" data-act="undo">완료 취소</button>` : ""}`
+      : step === 3 ? `<button class="btn brand" data-act="sign">${ic("pen")}${h(PL("btn.sign"))}</button>${!j.locked ? `<button class="btn ghost" data-act="undo">완료 취소</button>` : ""}`
       : `<div class="signed">${ic("check")}${h(DOC[j.part] || "확인서")} 서명 완료${j.sign_name ? " · " + h(j.sign_name) : ""}</div>`}
       ${!done ? checklist(j) : ""}
       <details class="fold"><summary>${ic("won")}메모 · 추가 정산<span class="sp">${[j.partner_note ? "메모" : "", j.extra_claim ? "요청됨" : ""].filter(Boolean).join(" · ")}</span></summary><div>
@@ -766,10 +771,7 @@ document.addEventListener("click", async (e) => {
   if (act === "note") return save(j, { partner_note: ed.partner_note ?? j.partner_note, visit_date: j.visit_date, visit_time: j.visit_time }, "메모를 저장했어요.");
   if (act === "done") {
     if (j.status !== "일정확정" || !j.visit_date) return toast("방문 날짜를 먼저 저장해 주세요.", true);
-    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.innerHTML = "한 번 더 누르면 완료 보고"; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ""; b.innerHTML = ic("check") + h(PL("btn.done")); } }, 3000); return; }
-    const ok = await save(j, { visit_date: j.visit_date, visit_time: j.visit_time, status: "완료", partner_note: ed.partner_note ?? j.partner_note }, "완료 보고했어요. 이제 서명을 받아 주세요.");
-    if (ok) { const nj = S.jobs.find((x) => x.id === j.id); if (nj) openSign(nj); }
-    return;
+    return openSign(j);
   }
   if (act === "undo") {
     if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "한 번 더 누르면 완료 취소"; return; }
