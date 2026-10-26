@@ -225,6 +225,15 @@ html[data-band="brand"]{--band:var(--brand);--band-ink:#ffffff;--band-sub:rgba(2
 html[data-band="brand"] .band .logo,html[data-band="brand"] .login .logo{background:#fff;color:var(--brand)}
 html[data-band="brand"] .login .btn.brand{background:#fff;color:var(--brand)}
 .fee-fold{margin-top:14px;background:var(--card);border-radius:16px;padding:14px 16px}.fee-fold summary{font-weight:700}
+.chips.cbx{flex-direction:column;flex-wrap:nowrap;max-height:240px;overflow:auto;gap:2px;border:1px solid var(--line);border-radius:12px;padding:6px;background:var(--card)}
+.chips.cbx .chip{border:0;border-radius:8px;background:none;text-align:left;display:flex;align-items:center;gap:10px;padding:9px 8px}
+.chips.cbx .chip::before{content:"";width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex:none;box-sizing:border-box}
+.chips.cbx .chip.on{background:var(--brand-soft);color:var(--ink)}.chips.cbx .chip.on::before{background:var(--brand);border-color:var(--brand);content:"✓";color:#fff;font-size:13px;line-height:16px;text-align:center;font-weight:900}
+.scl{display:grid;gap:8px}.scl details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}.scl summary{font-weight:700;cursor:pointer}
+.scl .sb{display:grid;gap:8px;margin-top:10px}.scl .sb h5{margin:4px 0 0;font-size:.82em;color:var(--ink3)}.scl .call{white-space:pre-wrap;background:var(--paper);border-radius:10px;padding:10px 12px;font-size:.92em;line-height:1.55}
+.scl textarea{min-height:150px;height:auto;padding:10px 12px;line-height:1.5}
+.agree{display:flex;gap:10px;align-items:flex-start;font-weight:700;background:var(--brand-soft);border-radius:12px;padding:12px}.agree input{width:22px;height:22px;flex:none;margin:0;height:22px}
+.cin{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 </style>
 </head>
 <body>
@@ -241,7 +250,7 @@ const PDEF = {
   "nav.db": "DB", "nav.done": "Done", "nav.stat": "My Stats", "nav.setl": "Settlement", "nav.set": "Settings",
   "band.today": "곳 오늘", "band.next": "다음 방문", "step.1": "날짜 저장", "step.2": "작업 완료", "step.3": "서명",
   "btn.date": "날짜 저장", "btn.done": "확인서 받고 완료", "btn.redate": "방문 날짜 변경 저장", "btn.sign": "현장 서명", "btn.signlink": "서명 링크 보내기",
-  "q.map": "길찾기", "q.call": "전화", "q.msg": "고객 안내", "q.report": "현장 메모", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
+  "q.map": "길찾기", "q.call": "전화", "q.msg": "스크립트", "q.report": "현장 메모", "note.env": "설치 환경", "note.sp": "특이사항", "note.req": "작업 요청",
   "st.배정": "날짜 미정", "st.일정확정": "일정 확정", "st.late": "방문일 지남", "st.완료": "서명 대기", "st.서명": "서명 완료",
   "doc.시공": "설치 확인서", "doc.촬영": "촬영 완료 확인서", "title.setl": "월 정산", "title.fees": "비용 정책",
 };
@@ -254,6 +263,200 @@ const CHECK_DEF = {
   촬영: ["카메라 배터리 충전", "메모리카드 여유 공간", "조명·삼각대 장비 점검", "매장·대표 메뉴 사전 확인", "주방·홀 정리 상태 확인", "메뉴별 촬영 완료", "원본 백업 · 결과물 일정 안내", "점주 최종 확인"],
   온보딩: ["점주 담당자·교육 시간 확인", "계정·매장 정보 확인", "메뉴·가격·옵션 확인", "관리자 페이지 로그인 교육", "주문·결제·취소 교육", "메뉴 수정·품절 처리 교육", "장애 접수·고객센터 안내", "교육 완료 확인"],
 };
+/* 확인서 공통 양식 — 시공·촬영 같은 스타일 */
+const CERT_INST_L = ["메뉴잇-포스", "메뉴잇-메뉴", "싱글스테이션", "멀티스테이션", "충전기"], CERT_INST_R = ["카드리더기", "공유기", "허브", "프린터", "멀티탭"];
+const certEsc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const certDay = (iso) => { if (!iso) return ""; const d = new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString(); return d.slice(0, 10); };
+const certTime = (t) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || "")); if (!m) return certEsc(t || ""); const H = Number(m[1]); return `${H < 12 ? "오전" : "오후"} ${((H + 11) % 12) + 1}시 ${m[2]}분`; };
+function certStamp(name) {
+  const n = String(name || "").replace(/\s/g, "").slice(0, 4); if (!n) return "";
+  const a = n.length <= 2 ? [n, "인"] : [n.slice(0, 2), n.slice(2) + (n.length === 3 ? "인" : "")];
+  return `<svg class="cstamp" viewBox="0 0 60 60" aria-label="${certEsc(name)} 도장"><circle cx="30" cy="30" r="27" fill="none" stroke="#d0261d" stroke-width="3"/><text x="30" y="27" text-anchor="middle" font-size="15" font-weight="700" fill="#d0261d" font-family="serif">${certEsc(a[0])}</text><text x="30" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#d0261d" font-family="serif">${certEsc(a[1])}</text></svg>`;
+}
+const CERT_CSS = `.cert{background:#fff;color:#111;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;padding:22px 20px;border-radius:6px;line-height:1.45;font-size:14px}
+.cert h1{text-align:center;font-size:21px;margin:0 0 18px;letter-spacing:.06em}
+.cert h2{font-size:14.5px;margin:18px 0 6px}
+.cert table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
+.cert th,.cert td{border:1px solid #cfcfcf;padding:7px 5px;text-align:center;word-break:break-all;vertical-align:middle}
+.cert th{font-weight:600;background:#f7f7f7}
+.cert td.v{text-align:left;padding-left:8px}
+.cert .memo{border:1px solid #cfcfcf;min-height:110px;padding:12px;white-space:pre-wrap;word-break:break-all;font-size:13.5px}
+.cert .ok{text-align:center;margin:18px 0 12px;font-size:13.5px}
+.cert .signs{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;font-size:13px}
+.cert .sg{display:grid;grid-template-columns:auto 1fr 64px;align-items:end;gap:6px;min-height:64px}
+.cert .sg .dt{grid-column:1/-1;text-align:right;color:#444;font-size:12.5px}
+.cert .sg .who{white-space:nowrap}.cert .sg .nm{font-weight:600}
+.cert .sg .cmark{width:64px;height:52px;display:grid;place-items:center;position:relative}
+.cert .sg .cmark img{max-width:64px;max-height:52px}
+.cert .cstamp{width:52px;height:52px;opacity:.9}
+.cert .foot{display:flex;align-items:center;gap:10px;margin-top:18px;border-top:1px solid #e3e3e3;padding-top:12px}
+.cert .clogo{font-weight:900;font-size:20px;letter-spacing:-.02em}.cert .clogo i{font-style:normal;color:#f26b1d}
+.cert .tel{font-size:12px;font-weight:700}
+.cert .ev{margin-left:auto;font-size:10.5px;color:#777;text-align:right;line-height:1.35}
+.cert .ck{display:inline-block;width:14px;height:14px;border:1.5px solid #333;vertical-align:-2px;margin:0 3px;text-align:center;line-height:11px;font-size:12px;font-weight:900}
+@media (max-width:520px){.cert{padding:16px 12px;font-size:13px}.cert table{font-size:12px}.cert .signs{grid-template-columns:1fr}.cert th,.cert td{padding:6px 3px}}`;
+/* j: job-like object. o: { title, tel, checker, checkedAt, sigImg, evidence, live } */
+function certHtml(j, o = {}) {
+  const c = j.cert || {}, ph = j.part === "촬영", sn = j.sign_name || "", sd = certDay(j.signed_at);
+  const it = j.install_items && Object.keys(j.install_items).length ? j.install_items : j.tablet_count ? { "메뉴잇-메뉴": { qty: j.tablet_count } } : {};
+  const q = (k) => certEsc((it[k] || {}).qty || ""), m = (k) => certEsc((it[k] || {}).method || "");
+  const memo = [j.special_notes, j.work_detail].filter(Boolean).join("\n\n");
+  const info = ph
+    ? `<table><colgroup><col style="width:20%"><col><col style="width:20%"><col style="width:26%"></colgroup>
+        <tr><th>매장명</th><td class="v" colspan="3">${certEsc(j.store_name)}</td></tr><tr><th>주소</th><td class="v" colspan="3">${certEsc(j.store_address || "")}</td></tr>
+        <tr><th>대표자(대리인)</th><td class="v">${certEsc(j.contact_name || "")}</td><th>휴대폰번호</th><td class="v">${certEsc(j.contact_phone || "")}</td></tr></table>`
+    : `<table><tr><th>사업자등록번호</th><td class="v">${certEsc(j.biz_no || "")}</td><th>매장명</th><td class="v">${certEsc(j.store_name)}</td></tr>
+        <tr><th>매장전화번호</th><td class="v">${certEsc(j.store_phone || j.contact_phone || "")}</td><th>방문일</th><td class="v">${certEsc(j.visit_date || "")}</td></tr>
+        <tr><th>대표자(대리인)</th><td class="v">${certEsc(j.contact_name || "")}</td><th>휴대폰번호</th><td class="v">${certEsc(j.contact_phone || "")}</td></tr>
+        <tr><th>주소</th><td class="v" colspan="3">${certEsc(j.store_address || "")}</td></tr></table>`;
+  const body = ph
+    ? `<h2>2. 촬영정보</h2><table><colgroup><col style="width:30%"><col style="width:40%"><col></colgroup><tr><th>구분</th><th>내용</th><th>비고</th></tr>
+        <tr><td>촬영일자</td><td>${certEsc(j.visit_date || "")}</td><td></td></tr><tr><td>시작시간</td><td>${certTime(c.start)}</td><td></td></tr>
+        <tr><td>종료시간</td><td>${certTime(c.end)}</td><td></td></tr><tr><td>사진 장수</td><td>${c.photos ? certEsc(c.photos) + "장" : ""}</td><td></td></tr>
+        <tr><td>촬영 결과물 확인여부</td><td colspan="2">네<span class="ck">${c.result_ok === true ? "✓" : ""}</span> 아니오<span class="ck">${c.result_ok === false ? "✓" : ""}</span></td></tr></table>`
+    : `<h2>2. 설치</h2><table><tr><th>구 분</th><th>수 량</th><th>시공방식</th><th>구 분</th><th>수 량</th></tr>${CERT_INST_L.map((k, i) => `<tr><th>${k}</th><td>${q(k)}</td><td>${m(k)}</td><th>${CERT_INST_R[i]}</th><td>${q(CERT_INST_R[i])}</td></tr>`).join("")}</table>`;
+  const pl = ph ? "촬영파트너" : "시공파트너", ev = o.evidence;
+  return `<div class="cert"><h1>${certEsc(o.title || (ph ? "메뉴 사진 촬영 확인서" : "메뉴잇 테이블 오더 시공 확인서"))}</h1>
+    <h2>1. 매장정보</h2>${info}${body}
+    <h2>3. 특이사항</h2><div class="memo">${certEsc(memo)}</div>
+    <p class="ok">위 내용에 틀림이 없음을 확인합니다.</p>
+    <div class="signs">
+      <div class="sg"><span class="dt">${certEsc(sd || (o.live ? certDay(new Date().toISOString()) : ""))}</span><span class="who">${pl} :</span><span class="nm">${certEsc(j.partner || j.partner_name || "")}</span><span class="cmark">${certStamp(j.partner || j.partner_name)}</span></div>
+      <div class="sg"><span class="dt">${certEsc(sd)}</span><span class="who">대표자(대리인) :</span><span class="nm">${certEsc(sn)}</span><span class="cmark">${o.sigImg ? `<img alt="서명" src="${o.sigImg}">` : sn ? "(인)" : ""}</span></div>
+      <div class="sg"><span class="dt">${certEsc(certDay(o.checkedAt || j.checked_at))}</span><span class="who">검수자(메뉴잇담당자) :</span><span class="nm">${certEsc(o.checker || j.checked_by || "")}</span><span class="cmark">${o.checker || j.checked_by ? "(인)" : ""}</span></div>
+    </div>
+    <div class="foot"><span class="clogo"><i>mi</i> 메뉴잇</span><span class="tel">TEL ${certEsc(o.tel || "1877-4463")}</span>
+      ${ev && ev.hash ? `<span class="ev">전자서명 ${certEsc(new Date(ev.server_time || j.signed_at).toLocaleString("ko-KR"))}<br>문서번호 ${certEsc(String(ev.hash).slice(0, 16).toUpperCase())}${ev.ip ? ` · IP ${certEsc(ev.ip)}` : ""}</span>` : ""}</div></div>`;
+}
+
+const SCRIPT_GROUPS = { pc: "파트너 → 점주", ap: "관리자 → 파트너", ac: "관리자 → 점주" };
+const SCRIPTS_DEF = [
+  { id: "p_first", g: "pc", part: "공통", title: "첫 연락 · 일정 잡기",
+    call: "1. 인사: 안녕하세요, {매장명} 사장님 맞으실까요? 메뉴잇 {종목} 담당 {파트너}입니다.\n2. 용건: 메뉴잇 본사 요청으로 {종목} 일정 잡아 드리려고 연락드렸습니다.\n3. 일정: 편하신 날짜와 시간대 있으실까요? (영업시간·브레이크 타임 확인)\n4. 현장 확인: 주차 가능 여부, 출입 방법, 당일 계실 분 성함·연락처 확인\n5. 마무리: 그럼 {방문일} {시간}에 방문드리겠습니다. 전날 한 번 더 연락드리겠습니다. 감사합니다.",
+    kakao: "[메뉴잇] {매장명} 사장님 안녕하세요.\n메뉴잇 {종목} 담당 {파트너}입니다.\n\n{종목} 일정 잡아 드리려고 연락드렸습니다.\n편하신 날짜와 시간대 알려주시면 맞춰서 방문드리겠습니다.\n(브레이크 타임, 주차 가능 여부도 함께 알려주시면 좋습니다)\n\n감사합니다." },
+  { id: "p_noanswer", g: "pc", part: "공통", title: "전화 안 받을 때",
+    call: "음성 사서함: 안녕하세요, 메뉴잇 {종목} 담당 {파트너}입니다. {매장명} 일정 관련해서 연락드렸습니다. 문자 남겨 드릴 테니 편하실 때 연락 부탁드립니다.\n※ 2시간 뒤 한 번 더 전화 → 당일 연결 안 되면 앱 현장 메모에 '부재' 남기기",
+    kakao: "[메뉴잇] {매장명} 사장님, 메뉴잇 {종목} 담당 {파트너}입니다.\n{종목} 일정 관련해서 전화드렸는데 연결이 안 되어 문자 남깁니다.\n\n가능한 날짜·시간을 답장 주시거나 편하실 때 이 번호로 연락 부탁드립니다.\n감사합니다." },
+  { id: "p_confirmed", g: "pc", part: "공통", title: "일정 확정 안내",
+    call: "{매장명} 사장님, {방문일} {시간} 방문으로 확정해 드렸습니다. 당일 출발할 때 한 번 더 연락드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, {종목} 일정 확정 안내드립니다.\n\n· 일시: {방문일} {시간}\n· 주소: {주소}\n· 담당: {파트너}\n\n일정 변경이 필요하시면 이 번호로 미리 연락 부탁드립니다.\n감사합니다." },
+  { id: "p_daybefore", g: "pc", part: "공통", title: "방문 전날 확인",
+    call: "{매장명} 사장님, 내일 {시간} 메뉴잇 {종목} 방문 예정이라 확인차 연락드렸습니다. 내일 일정 그대로 괜찮으실까요? 당일 계실 분 성함도 한 번 더 확인 부탁드립니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 내일 방문 일정 확인드립니다.\n\n· 일시: {방문일} {시간}\n· 담당: {파트너}\n\n변동 있으시면 오늘 중으로 답장 부탁드립니다.\n감사합니다." },
+  { id: "p_ontheway", g: "pc", part: "공통", title: "당일 출발 · 도착 예정",
+    call: "{매장명} 사장님, 메뉴잇 {파트너}입니다. 지금 출발해서 약 OO분 뒤 도착 예정입니다. 도착하면 다시 연락드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, {파트너}입니다.\n지금 출발해서 약 OO분 뒤 도착 예정입니다.\n도착하면 다시 연락드리겠습니다." },
+  { id: "p_late", g: "pc", part: "공통", title: "도착이 늦어질 때",
+    call: "{매장명} 사장님, 정말 죄송합니다. 교통 사정으로 약 OO분 늦어질 것 같습니다. 영업에 지장 없게 최대한 빨리 가겠습니다. 시간이 어려우시면 편하신 시간으로 다시 잡아드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 죄송합니다.\n교통 사정으로 약 OO분 늦어질 것 같습니다.\n도착 시간 맞추기 어려우시면 답장 주세요. 편하신 시간으로 다시 잡아 드리겠습니다." },
+  { id: "p_resched_me", g: "pc", part: "공통", title: "내 사정으로 일정 변경",
+    call: "{매장명} 사장님, 정말 죄송합니다. 개인 사정으로 {방문일} 방문이 어려워져 일정 조정 부탁드리려고 연락드렸습니다. 혹시 가능한 날짜 있으실까요? (새 날짜 확정 후 앱에서 방문일 변경 저장)",
+    kakao: "[메뉴잇] {매장명} 사장님, 죄송합니다.\n부득이한 사정으로 {방문일} 방문이 어려워 일정 조정을 부탁드립니다.\n가능하신 날짜·시간 알려주시면 최우선으로 맞추겠습니다." },
+  { id: "p_resched_cust", g: "pc", part: "공통", title: "점주가 일정 변경을 원할 때",
+    call: "네, 괜찮습니다. 편하신 날짜와 시간 말씀해 주시면 맞춰 드리겠습니다. (새 일정 확정 → 앱에서 방문일 변경 저장 → 아래 문자로 확인)",
+    kakao: "[메뉴잇] {매장명} 사장님, 요청하신 대로 일정 변경해 드렸습니다.\n\n· 변경 일시: {방문일} {시간}\n· 담당: {파트너}\n\n감사합니다." },
+  { id: "p_absent", g: "pc", part: "공통", title: "도착했는데 매장이 닫혀 있을 때",
+    call: "{매장명} 사장님, 메뉴잇 {파트너}입니다. 약속 시간에 맞춰 매장 앞에 도착했는데 문이 닫혀 있어 연락드렸습니다. 언제쯤 오실 수 있을까요? (15분 대기 후에도 연락 안 되면 현장 메모 남기고 본사 보고)",
+    kakao: "[메뉴잇] {매장명} 사장님, {파트너}입니다.\n약속 시간에 매장 앞에 도착했는데 문이 닫혀 있어 연락드립니다.\n확인하시면 바로 연락 부탁드립니다." },
+  { id: "p_extra", g: "pc", part: "공통", title: "현장에서 추가 작업 · 비용이 생길 때",
+    call: "사장님, 현장 확인해 보니 OO 작업이 추가로 필요합니다. 추가 비용은 메뉴잇 본사 확인 후 안내드리겠습니다. 제가 임의로 비용을 받거나 약속드리지는 않습니다. (앱에서 추가 정산 저장 + 사진 남기기)",
+    kakao: "[메뉴잇] {매장명} 사장님, 현장 확인 결과 OO 작업이 추가로 필요합니다.\n추가 비용 여부는 메뉴잇 본사에서 확인 후 따로 안내드리겠습니다.\n감사합니다." },
+  { id: "p_sign", g: "pc", part: "공통", title: "완료 후 확인서 서명 받기 (현장)",
+    call: "사장님, 작업 다 마쳤습니다. 같이 동작 한 번 확인해 주시겠어요? (주문·결제·출력 테스트) 이상 없으시면 휴대폰 화면에 {확인서} 서명만 부탁드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, {종목} 작업이 완료되었습니다.\n현장에서 {확인서} 서명 부탁드립니다.\n감사합니다." },
+  { id: "p_done", g: "pc", part: "공통", title: "작업 완료 안내",
+    call: "오늘 작업 모두 마쳤습니다. 사용하시다 불편하신 점은 메뉴잇 고객센터로 연락 주시면 바로 도와드립니다. 감사합니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 오늘 {종목} 작업 모두 완료되었습니다.\n사용하시다 불편한 점은 메뉴잇 고객센터로 연락 주시면 바로 도와드리겠습니다.\n오늘 시간 내주셔서 감사합니다." },
+  { id: "p_cancel", g: "pc", part: "공통", title: "점주가 취소를 원할 때",
+    call: "네, 말씀 잘 들었습니다. 취소는 메뉴잇 본사에서 처리하게 되어 있어서 본사 담당자가 곧 연락드리겠습니다. 혹시 취소 사유 여쭤봐도 될까요? (앱 현장 메모 → 취소 요청에 사유 저장)",
+    kakao: "[메뉴잇] {매장명} 사장님, 취소 요청 잘 전달받았습니다.\n메뉴잇 본사 담당자가 확인 후 연락드리겠습니다.\n감사합니다." },
+  { id: "p_issue", g: "pc", part: "공통", title: "장비 문제 · 불량을 발견했을 때",
+    call: "사장님, 설치 중 OO 장비에 문제가 확인되었습니다. 메뉴잇 본사에 바로 보고해서 교체·조치 일정 안내드리겠습니다. 오늘 사용 가능한 부분은 먼저 세팅해 드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 설치 중 OO 장비 이상이 확인되어 본사에 보고드렸습니다.\n조치 일정은 본사에서 따로 안내드리겠습니다.\n불편 드려 죄송합니다." },
+  { id: "p_complaint", g: "pc", part: "공통", title: "불만 · 항의를 받을 때",
+    call: "1. 끝까지 듣기 (말 끊지 않기)\n2. 사과: 불편 드려 죄송합니다.\n3. 확인: 말씀하신 내용이 OO 맞으실까요?\n4. 약속은 하지 않기: 본사에 그대로 전달해서 담당자가 바로 연락드리겠습니다.\n5. 앱 현장 메모에 내용 그대로 저장",
+    kakao: "[메뉴잇] {매장명} 사장님, 말씀하신 내용 본사에 그대로 전달드렸습니다.\n담당자가 확인 후 바로 연락드리겠습니다.\n불편 드려 죄송합니다." },
+  { id: "i_prep", g: "pc", part: "시공", title: "시공 전 준비 안내",
+    call: "방문 전에 몇 가지만 부탁드리겠습니다. 태블릿 놓을 테이블 위치, 포스·프린터 놓을 자리, 근처 콘센트와 와이파이 비밀번호 미리 확인해 주시면 빠르게 끝낼 수 있습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 시공 전 준비 부탁드립니다.\n\n· 와이파이 이름·비밀번호\n· 포스·프린터 놓을 자리와 근처 콘센트\n· 태블릿 놓을 테이블 위치\n\n미리 준비해 주시면 작업이 빨리 끝납니다. 감사합니다." },
+  { id: "s_prep", g: "pc", part: "촬영", title: "촬영 전 준비 안내",
+    call: "촬영 전에 부탁드릴 게 있습니다. 대표 메뉴부터 순서대로 바로 낼 수 있게 준비해 주시고, 그릇·홀 테이블 정리 부탁드립니다. 메뉴 수가 많으면 미리 목록 보내주시면 시간 맞춰 드리겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 촬영 전 준비 부탁드립니다.\n\n· 촬영할 메뉴 목록 (대표 메뉴 먼저)\n· 메뉴별 바로 낼 수 있게 준비\n· 그릇·홀 테이블 정리\n\n· 일시: {방문일} {시간}\n· 담당: {파트너}\n감사합니다." },
+  { id: "s_result", g: "pc", part: "촬영", title: "촬영 결과물 일정 안내",
+    call: "오늘 촬영 모두 마쳤습니다. 보정 후 결과물은 메뉴잇 본사를 통해 메뉴판에 반영됩니다. 반영 일정은 본사에서 안내드릴 예정입니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 오늘 촬영 모두 마쳤습니다.\n보정 후 메뉴잇 본사를 통해 메뉴판에 반영되며, 일정은 본사에서 안내드리겠습니다.\n감사합니다." },
+
+  { id: "a_assign", g: "ap", part: "공통", title: "신규 배정 안내",
+    call: "{파트너}님, 메뉴잇입니다. {매장명} {종목} 건 배정드렸습니다. 앱에서 매장 정보·설치 환경 확인하시고 오늘 중으로 점주님께 연락해서 날짜 저장 부탁드립니다.",
+    kakao: "[메뉴잇] {파트너}님, 새 {종목} 배정 안내드립니다.\n\n· 매장: {매장명}\n· 주소: {주소}\n· 점주: {점주} {점주연락처}\n· 작업: {작업내용}\n· 금액: {금액}\n\n오늘 중으로 점주님께 연락 후 앱에서 날짜 저장 부탁드립니다.\n{앱링크}" },
+  { id: "a_nodate", g: "ap", part: "공통", title: "날짜 미입력 확인",
+    call: "{파트너}님, {매장명} 건 아직 방문 날짜가 저장이 안 되어 있어서 연락드렸습니다. 점주님과 통화되셨을까요? 오늘 중으로 앱에 날짜 저장 부탁드립니다.",
+    kakao: "[메뉴잇] {파트너}님, {매장명} 건 방문 날짜가 아직 저장되지 않았습니다.\n점주님 연락 후 오늘 중으로 앱에서 날짜 저장 부탁드립니다.\n{앱링크}" },
+  { id: "a_contact", g: "ap", part: "공통", title: "점주 컨택 여부 확인",
+    call: "{파트너}님, {매장명} 점주님과 통화되셨을까요? 연락 안 되셨으면 문자 남겨두시고 현장 메모에 '부재' 남겨 주세요.",
+    kakao: "[메뉴잇] {파트너}님, {매장명} 점주님 컨택 되셨는지 확인 부탁드립니다.\n연락이 안 되셨으면 앱 현장 메모에 남겨 주세요." },
+  { id: "a_change", g: "ap", part: "공통", title: "파트너 변경 · 배정 취소 안내",
+    call: "{파트너}님, {매장명} 건은 OO 사유로 배정이 변경(취소)되었습니다. 앱 목록에서도 빠질 예정입니다. 번거롭게 해드려 죄송합니다.",
+    kakao: "[메뉴잇] {파트너}님, {매장명} 건 배정이 변경(취소)되었습니다.\n사유: OO\n번거롭게 해드려 죄송합니다." },
+  { id: "a_unsigned", g: "ap", part: "공통", title: "확인서 서명 누락",
+    call: "{파트너}님, {매장명} 건 {확인서} 서명이 아직 안 들어와 있습니다. 서명이 있어야 완료·정산 처리가 되니 점주님께 서명 부탁드립니다.",
+    kakao: "[메뉴잇] {파트너}님, {매장명} 건 {확인서} 서명이 누락되어 있습니다.\n서명이 있어야 완료·정산 처리되니 확인 부탁드립니다.\n{앱링크}" },
+  { id: "a_claim", g: "ap", part: "공통", title: "추가 정산 승인 · 조정 안내",
+    call: "{파트너}님, {매장명} 건 추가 정산 요청 확인했습니다. OO원으로 반영(조정)했습니다. 사유는 OO입니다.",
+    kakao: "[메뉴잇] {파트너}님, {매장명} 건 추가 정산 OO원 반영되었습니다.\n(조정 시 사유: OO)" },
+  { id: "a_setl", g: "ap", part: "공통", title: "월 정산 확인 요청",
+    call: "{파트너}님, {월} 정산 금액 올려드렸습니다. 앱 Settlement 탭에서 내역 확인하시고 맞으면 ‘정산 요청’, 다르면 ‘수정 요청’ 눌러 주세요.",
+    kakao: "[메뉴잇] {파트너}님, {월} 정산 금액 확인 부탁드립니다.\n앱 Settlement 탭에서 내역 확인 후 ‘정산 요청’ 또는 ‘수정 요청’ 눌러 주세요.\n{앱링크}" },
+  { id: "a_fix", g: "ap", part: "공통", title: "수정 요청 답변",
+    call: "{파트너}님, 말씀하신 {월} 정산 수정 내용 확인했습니다. OO 반영해서 다시 올려드렸습니다. 다시 한 번 확인 부탁드립니다.",
+    kakao: "[메뉴잇] {파트너}님, {월} 정산 수정 요청 반영했습니다.\n반영 내용: OO\n앱에서 다시 확인 부탁드립니다.\n{앱링크}" },
+  { id: "a_paid", g: "ap", part: "공통", title: "지급 완료 안내",
+    call: "{파트너}님, {월} 정산 금액 지급 완료되었습니다. 한 달 동안 고생 많으셨습니다.",
+    kakao: "[메뉴잇] {파트너}님, {월} 정산금 지급 완료되었습니다.\n한 달 동안 고생 많으셨습니다. 감사합니다." },
+
+  { id: "c_assign", g: "ac", part: "공통", title: "담당 파트너 배정 안내",
+    call: "{매장명} 사장님, 메뉴잇입니다. {종목} 담당 파트너가 배정되어 곧 일정 잡으려고 연락드릴 예정입니다. 담당자는 {파트너}님입니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, {종목} 담당 파트너 배정 안내드립니다.\n\n· 담당: {파트너} {파트너연락처}\n\n담당 파트너가 곧 일정 잡으려고 연락드릴 예정입니다.\n감사합니다." },
+  { id: "c_confirmed", g: "ac", part: "공통", title: "일정 확정 안내",
+    call: "{매장명} 사장님, {방문일} {시간} {종목} 방문으로 확정되었습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, {종목} 일정 확정 안내드립니다.\n\n· 일시: {방문일} {시간}\n· 담당: {파트너}\n\n감사합니다." },
+  { id: "c_delay", g: "ac", part: "공통", title: "일정 지연 · 연락 늦어짐 사과",
+    call: "{매장명} 사장님, 메뉴잇입니다. 일정 안내가 늦어져 정말 죄송합니다. 오늘 중으로 담당 파트너가 연락드리도록 하겠습니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 일정 안내가 늦어져 죄송합니다.\n오늘 중으로 담당 파트너가 연락드리도록 하겠습니다.\n감사합니다." },
+  { id: "c_change", g: "ac", part: "공통", title: "일정 · 담당자 변경 안내",
+    call: "{매장명} 사장님, 메뉴잇입니다. 부득이하게 일정(담당자)이 변경되어 안내드립니다. 새 일정은 {방문일} {시간}, 담당은 {파트너}님입니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 일정(담당자) 변경 안내드립니다.\n\n· 일시: {방문일} {시간}\n· 담당: {파트너}\n\n불편 드려 죄송합니다." },
+  { id: "c_pay", g: "ac", part: "촬영", title: "촬영비 입금 안내",
+    call: "{매장명} 사장님, 메뉴잇입니다. 메뉴 촬영은 1회 {촬영비}원(부가세 별도)이고, 입금 확인 후 촬영 일정이 확정됩니다.",
+    kakao: "[메뉴잇] {매장명} 사장님, 메뉴 촬영비 안내드립니다.\n\n· 촬영비: {촬영비}원 (부가세 별도)\n· 입금 확인 후 촬영 일정이 확정됩니다.\n\n감사합니다." },
+  { id: "c_done", g: "ac", part: "공통", title: "완료 감사 · 사후 안내",
+    call: "{매장명} 사장님, 메뉴잇입니다. {종목} 잘 마무리되셨는지 확인차 연락드렸습니다. 사용하시다 불편한 점 있으시면 언제든 말씀해 주세요.",
+    kakao: "[메뉴잇] {매장명} 사장님, {종목} 완료되었습니다.\n사용하시다 불편한 점은 메뉴잇 고객센터로 언제든 연락 주세요.\n감사합니다." },
+  { id: "c_cancel", g: "ac", part: "공통", title: "취소 처리 안내",
+    call: "{매장명} 사장님, 요청하신 {종목} 일정 취소 처리해 드렸습니다. 다시 필요하시면 언제든 연락 주세요.",
+    kakao: "[메뉴잇] {매장명} 사장님, 요청하신 {종목} 일정 취소 처리되었습니다.\n다시 필요하시면 언제든 연락 주세요.\n감사합니다." },
+];
+
+document.head.insertAdjacentHTML("beforeend", `<style>${CERT_CSS}</style>`);
+const scriptsP = () => (Array.isArray(UI.scripts) && UI.scripts.length ? UI.scripts : SCRIPTS_DEF.filter((x) => x.g === "pc"));
+function scriptVars(j) { return j ? { 매장명: j.store_name, 종목: j.part, 파트너: S.me?.name || "", 방문일: j.visit_date ? dlabel(j.visit_date).replace(/ · .*/, "") : "(협의 중)", 시간: j.visit_time || "", 주소: j.store_address || "", 작업내용: j.work_type || j.part, 확인서: DOC[j.part] || "확인서", 점주: j.contact_name || "", 점주연락처: j.contact_phone || "", 담당자: j.contact_name || "", 연락처: j.contact_phone || "" } : { 파트너: S.me?.name || "" }; }
+const fillV = (t, v) => String(t || "").replace(/\{([^}]+)\}/g, (m, k) => (k in v ? v[k] || "" : m));
+function openScripts(j) {
+  const parts = j ? ["공통", j.part] : ["공통", ...(S.me?.parts || PARTS)], v = scriptVars(j), tel = j ? telOf(j.contact_phone) : "";
+  const list = scriptsP().filter((x) => parts.includes(x.part));
+  sheet(j ? `스크립트 · ${j.store_name}` : "스크립트 가이드", `<div class="scl">${list.map((x, i) => { const k = fillV(x.kakao, v); return `<details><summary>${h(x.title)}${x.part !== "공통" ? ` <span class="tag p">${h(x.part)}</span>` : ""}</summary><div class="sb">
+      ${x.call ? `<h5>전화</h5><div class="call">${h(fillV(x.call, v))}</div>` : ""}
+      ${x.kakao ? `<h5>카톡 · 문자</h5><textarea id="sc_${i}">${h(k)}</textarea><div class="pair"><button class="btn brand sm" data-act="sccopy" data-t="sc_${i}">카톡용 복사</button>${tel ? `<a class="btn sm" href="sms:${h(tel)}?&body=${encodeURIComponent(k)}">문자</a>` : `<span></span>`}</div>` : ""}
+      ${tel && x.call ? `<a class="btn ghost sm" href="tel:${h(tel)}">전화 걸기</a>` : ""}</div></details>`; }).join("")}</div>`);
+}
+/* 화면 문구 바꾸기 (관리자 설정) */
+function applyTexts(root) {
+  const map = UI.text || {}; if (!Object.keys(map).length || !root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while ((n = w.nextNode())) { const p = n.parentElement; if (!p || p.closest("textarea,.cert,.call")) continue; const t = n.nodeValue.trim(); if (t && map[t]) n.nodeValue = n.nodeValue.replace(t, map[t]); }
+  root.querySelectorAll && root.querySelectorAll("[placeholder]").forEach((el) => { const t = el.getAttribute("placeholder"); if (map[t]) el.setAttribute("placeholder", map[t]); });
+}
+new MutationObserver((ms) => { for (const m of ms) for (const nd of m.addedNodes) if (nd.nodeType === 1) applyTexts(nd); else if (nd.nodeType === 3 && nd.parentElement) applyTexts(nd.parentElement); }).observe(document.documentElement, { childList: true, subtree: true });
 const DEFAULT_MSG = {
   customer_scheduled: "안녕하세요, {매장명} 사장님.\n메뉴잇 {종목} 담당 {파트너}입니다.\n\n방문 일정 안내드립니다.\n· 일시: {방문일} {시간}\n· 주소: {주소}\n· 작업: {작업내용}\n\n일정 변경이 필요하시면 이 번호로 연락 부탁드립니다.\n감사합니다.",
   customer_done: "안녕하세요, {매장명} 사장님.\n메뉴잇 {종목} 담당 {파트너}입니다.\n\n오늘 {종목} 작업이 완료되었습니다.\n사용 중 불편하신 점은 메뉴잇 고객센터로 연락 주시면 빠르게 도와드리겠습니다.\n\n이용해 주셔서 감사합니다.",
@@ -338,7 +541,7 @@ function toolbar(key) {
 function openFilter(key) {
   const f = S.f[key], parts = (S.me?.parts?.length ? S.me.parts : PARTS);
   const stores = [...new Set(S.jobs.filter((j) => key === "db" ? j.status !== "완료" : j.status === "완료").map((j) => j.store_name))].sort();
-  const grp = (k, opts) => `<div class="chips">${opts.map(([v, l]) => `<button class="chip ${f[k] === v ? "on" : ""}" data-f="${key}" data-k="${k}" data-v="${h(v)}" data-keep="1">${h(l)}</button>`).join("")}</div>`;
+  const grp = (k, opts) => `<div class="chips cbx">${opts.map(([v, l]) => `<button class="chip ${f[k] === v ? "on" : ""}" data-f="${key}" data-k="${k}" data-v="${h(v)}" data-keep="1">${h(l)}</button>`).join("")}</div>`;
   sheet("필터", `
     ${parts.length > 1 ? `<div class="fsec"><b>종목</b>${grp("part", [["", "전체"], ...parts.map((p) => [p, p])])}</div>` : ""}
     <div class="fsec"><b>상태</b>${grp("status", STATUSES[key])}</div>
@@ -424,36 +627,20 @@ function sheet(title, body) {
 }
 function closeSheet() { $("#layer").innerHTML = ""; }
 
-const INST_L = ["메뉴잇-포스", "메뉴잇-메뉴", "싱글스테이션", "멀티스테이션", "충전기"], INST_R = ["카드리더기", "공유기", "허브", "프린터", "멀티탭"];
-function installDoc(j) {
-  const it = j.install_items && Object.keys(j.install_items).length ? j.install_items : (j.tablet_count ? { "메뉴잇-메뉴": { qty: j.tablet_count, method: "" } } : {});
-  const q = (k) => (it[k] && it[k].qty) || "", m = (k) => (it[k] && it[k].method) || "", memo = [j.special_notes, j.work_detail].filter(Boolean).join("\n\n");
-  return `<div class="doc cf" style="background:#fff"><h4>${h(DOC.시공 === "설치 확인서" ? "메뉴잇 테이블 오더 시공 확인서" : DOC.시공)}</h4>
-    <h5>1. 매장 정보</h5><table><tr><th>사업자<br>등록번호</th><td class="v">${h(j.biz_no || "")}</td><th>매장명</th><td class="v">${h(j.store_name)}</td><th>매장<br>전화번호</th><td class="v">${h(j.store_phone || j.contact_phone || "")}</td></tr>
-      <tr><th>방문<br>예정일</th><td class="v">${h(j.visit_date || "")}</td><th>대표자</th><td class="v">${h(j.contact_name || "")}</td><th>휴대폰<br>번호</th><td class="v">${h(j.contact_phone || "")}</td></tr>
-      <tr><th>주소</th><td class="v" colspan="5">${h(j.store_address || "")}</td></tr></table>
-    <h5>2. 설치</h5><table class="inst"><colgroup><col style="width:25%"><col style="width:13%"><col style="width:21%"><col style="width:25%"><col style="width:16%"></colgroup><tr><th>구 분</th><th>수 량</th><th>시공방식</th><th>구 분</th><th>수 량</th></tr>
-      ${INST_L.map((k, i) => `<tr><th>${k}</th><td>${h(q(k))}</td><td>${h(m(k))}</td><th>${INST_R[i]}</th><td>${h(q(INST_R[i]))}</td></tr>`).join("")}</table>
-    <h5>3. 특이사항</h5><div class="memo">${h(memo)}</div>
-    <div class="note" style="margin-top:10px">위 매장에 메뉴잇 시공이 완료되었으며, 장비 설치 상태와 작동을 확인했습니다. (작업자: ${h(S.me?.name || "")})</div></div>`;
-}
+S.cert = {};
+const certTitle = (j) => (DOC[j.part] && !["설치 확인서", "촬영 완료 확인서"].includes(DOC[j.part]) ? DOC[j.part] : j.part === "촬영" ? "메뉴 사진 촬영 확인서" : "메뉴잇 테이블 오더 시공 확인서");
+function certPreview(j) { const c = { ...(j.cert || {}), ...(S.cert[j.id] || {}) }; return certHtml({ ...j, cert: c, partner: S.me?.name || "" }, { title: certTitle(j), live: true, tel: (UI.ops || {}).tel }); }
 function openSign(j) {
-  if (j.part === "시공") {
-    sheet(DOC[j.part] || "시공 확인서", `${installDoc(j)}
-    <label>확인자 성함 (매장)<input id="sgName" placeholder="예: 홍길동 (대표)" autocomplete="off" value="${h(j.contact_name || "")}"></label>
-    <div class="pad-wrap"><canvas class="pad" id="pad"></canvas><div class="pad-hint" id="padHint">매장 담당자가 여기에 서명해 주세요</div></div>
-    <div class="err" id="sgErr" style="color:var(--alert)"></div>
-    <div class="pair"><button class="btn ghost" data-act="padclear">지우기</button><button class="btn brand" data-act="signsave" data-id="${h(j.id)}">서명 완료</button></div>`);
-    return setupPad();
-  }
-  const work = [j.work_type, j.tablet_count ? `태블릿 ${j.tablet_count}대` : "", j.pos_type].filter(Boolean).join(" · ");
-  sheet(DOC[j.part] || "완료 확인서", `<div class="doc">
-      <div class="hd"><div class="logo" style="width:28px;height:28px;font-size:13px">M</div><b>MENUIT ${h(DOC[j.part] || "완료 확인서")}</b></div>
-      <dl><dt>매장명</dt><dd>${h(j.store_name)}</dd>${j.store_address ? `<dt>주소</dt><dd>${h(j.store_address)}</dd>` : ""}${work ? `<dt>작업</dt><dd>${h(work)}</dd>` : ""}
-      ${j.work_detail ? `<dt>내용</dt><dd>${h(j.work_detail)}</dd>` : ""}<dt>작업일</dt><dd>${h(dlabel(j.visit_date || doneDate(j) || today()).replace(/ · .*/, ""))}</dd><dt>작업자</dt><dd>${h(S.me?.name || "")}</dd></dl>
-      <div class="note">위 매장에 메뉴잇 ${h(j.part)} 작업이 완료되었으며, ${j.part === "촬영" ? "촬영이 정상적으로 진행되었음을" : "장비 설치 상태와 작동을"} 확인했습니다.</div></div>
-    <label>확인자 성함 (매장)<input id="sgName" placeholder="예: 홍길동 (대표)" autocomplete="off" value="${h(j.contact_name || "")}"></label>
-    <div class="pad-wrap"><canvas class="pad" id="pad"></canvas><div class="pad-hint" id="padHint">매장 담당자가 여기에 서명해 주세요</div></div>
+  const c = S.cert[j.id] ||= { ...(j.cert || {}) }, ph = j.part === "촬영";
+  sheet(certTitle(j), `${ph ? `<div class="cin">
+      <label>시작시간<input type="time" data-cert="start" data-id="${h(j.id)}" value="${h(c.start || "")}"></label>
+      <label>종료시간<input type="time" data-cert="end" data-id="${h(j.id)}" value="${h(c.end || "")}"></label>
+      <label>사진 장수<input inputmode="numeric" data-cert="photos" data-id="${h(j.id)}" value="${h(c.photos || "")}" placeholder="장"></label>
+      <div><label>촬영 결과물 확인</label><div class="chips cbx" style="max-height:none"><button class="chip ${c.result_ok === true ? "on" : ""}" data-act="certok" data-v="1" data-id="${h(j.id)}">네</button><button class="chip ${c.result_ok === false ? "on" : ""}" data-act="certok" data-v="0" data-id="${h(j.id)}">아니오</button></div></div></div>` : ""}
+    <div id="cprev">${certPreview(j)}</div>
+    <label>대표자(대리인) 성함<input id="sgName" placeholder="예: 홍길동" autocomplete="off" value="${h(j.contact_name || "")}"></label>
+    <div class="pad-wrap"><canvas class="pad" id="pad"></canvas><div class="pad-hint" id="padHint">대표자(대리인)가 여기에 서명해 주세요</div></div>
+    <label class="agree"><input type="checkbox" id="sgAgree">위 내용에 틀림이 없음을 확인하며, 전자 서명에 동의합니다.</label>
     <div class="err" id="sgErr" style="color:var(--alert)"></div>
     <div class="pair"><button class="btn ghost" data-act="padclear">지우기</button><button class="btn brand" data-act="signsave" data-id="${h(j.id)}">서명 완료</button></div>`);
   setupPad();
@@ -474,6 +661,9 @@ async function submitSign(j, btn) {
   if (j.status !== "완료" && !(j.status === "일정확정" && j.visit_date)) { err.textContent = "방문 날짜를 먼저 저장해 주세요."; return; }
   if (!nm) { err.textContent = "확인자 성함을 입력해 주세요."; return; }
   if (!PAD || !PAD.dirty) { err.textContent = "서명란에 서명해 주세요."; return; }
+  if (!$("#sgAgree").checked) { err.textContent = "확인 및 전자 서명 동의에 체크해 주세요."; return; }
+  const cv = S.cert[j.id] || {};
+  if (j.part === "촬영" && (!cv.start || !cv.end || !cv.photos || cv.result_ok == null)) { err.textContent = "시작·종료시간, 사진 장수, 결과물 확인을 입력해 주세요."; return; }
   const c = PAD.c, out = document.createElement("canvas"), w = 600, hh = Math.round(600 * c.height / c.width); out.width = w; out.height = hh;
   const o = out.getContext("2d"); o.fillStyle = "#fff"; o.fillRect(0, 0, w, hh); o.drawImage(c, 0, 0, w, hh);
   btn.disabled = true; btn.textContent = "저장 중…";
@@ -483,9 +673,9 @@ async function submitSign(j, btn) {
       if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
       j.status = "완료";
     }
-    const r = await rpc("sign_submit", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png") });
+    const r = await rpc("sign_submit2", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png"), p_cert: j.part === "촬영" ? cv : null, p_ua: navigator.userAgent, p_agree: true });
     if (r && (r.ok || r.error === "already")) { closeSheet(); toast(`${DOC[j.part] || "확인서"} 서명 받고 완료했어요.`); await load(); const nj = S.jobs.find((x) => x.id === j.id); if (nj) openMsg(nj, "customer_done"); return; }
-    err.textContent = r && r.error === "not_done" ? "작업 완료를 먼저 눌러 주세요." : "저장하지 못했어요. 다시 시도해 주세요.";
+    err.textContent = r && r.error === "not_done" ? "작업 완료를 먼저 눌러 주세요." : r && r.error === "need_agree" ? "동의에 체크해 주세요." : "저장하지 못했어요. 다시 시도해 주세요.";
   } catch { err.textContent = "연결이 원활하지 않아요. 다시 시도해 주세요."; }
   btn.disabled = false; btn.textContent = "서명 완료";
 }
@@ -667,6 +857,7 @@ function viewSet() {
       ${Object.keys(MSG_LABEL).map((k) => `<label>${MSG_LABEL[k]}${mine[k] ? " · 내 문구" : ""}<textarea id="s_msg_${k}" style="min-height:150px">${h(msgFor(k, part))}</textarea></label>`).join("")}
       <p class="vars">쓸 수 있는 칸: {매장명} {종목} {파트너} {방문일} {시간} {주소} {작업내용} {담당자} {연락처} {확인서} {서명링크}</p>
       <button class="btn ghost sm" data-act="msgreset">회사 기본 문구로 되돌리기</button></section>
+    <section class="set"><h3>스크립트 가이드</h3><button class="btn sm" data-act="scripts">전화 · 카톡 스크립트 보기</button></section>
     <section class="set"><h3>화면</h3>
       <label>글자 크기</label><input type="hidden" id="s_font" value="${Number(st.fontSize || 16)}">
       <div class="chips">${[[14, "작게"], [16, "보통"], [18, "크게"], [20, "아주 크게"]].map(([n, l]) => `<button class="chip ${Number(st.fontSize || 16) === n ? "on" : ""}" data-act="pick" data-t="s_font" data-v="${n}">${l}</button>`).join("")}</div>
@@ -726,6 +917,7 @@ async function respondSetl(month, ok) {
 let qTimer = null;
 document.addEventListener("input", (e) => {
   const t = e.target;
+  if (t.dataset.cert) { const id = t.dataset.id; (S.cert[id] ||= {})[t.dataset.cert] = t.value; const j = S.jobs.find((x) => x.id === id); const pv = $("#cprev"); if (j && pv) pv.innerHTML = certPreview(j); return; }
   if (t.dataset.e) { const c = t.closest(".tk"); if (c) (S.edits[c.dataset.id] ||= {})[t.dataset.e] = t.value; return; }
   if (t.dataset.fi) { S.f[t.dataset.fi][t.dataset.k] = t.value; saveF(); clearTimeout(qTimer); qTimer = setTimeout(render, t.type === "search" ? 250 : 0); }
 });
@@ -741,6 +933,9 @@ document.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act, c = b.closest(".tk"), j = c && S.jobs.find((x) => x.id === c.dataset.id), ed = (j && S.edits[j.id]) || {};
   if (act === "close") return closeSheet();
+  if (act === "certok") { const id = b.dataset.id; (S.cert[id] ||= {}).result_ok = b.dataset.v === "1"; b.parentElement.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); const jj = S.jobs.find((x) => x.id === id); const pv = $("#cprev"); if (jj && pv) pv.innerHTML = certPreview(jj); return; }
+  if (act === "sccopy") { const el = $("#" + b.dataset.t); try { await navigator.clipboard.writeText(el.value); toast("복사했어요. 카톡에 붙여넣으세요."); } catch { el.focus(); el.select(); toast("선택된 글자를 직접 복사해 주세요."); } return; }
+  if (act === "scripts") return openScripts(null);
   if (act === "reload") { await load(); return toast("새로 불러왔어요."); }
   if (act === "logout") return logout();
   if (act === "fsheet") return openFilter(b.dataset.v);
@@ -760,7 +955,7 @@ document.addEventListener("click", async (e) => {
   if (act === "signsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) submitSign(jj, b); return; }
   if (act === "claimsave") { const jj = S.jobs.find((x) => x.id === b.dataset.id); if (jj) saveClaim(jj); return; }
   if (!j) return;
-  if (act === "msg") return openMsg({ ...j, visit_date: ed.visit_date ?? j.visit_date, visit_time: ed.visit_time ?? j.visit_time }, b.dataset.k);
+  if (act === "msg") return openScripts({ ...j, visit_date: ed.visit_date ?? j.visit_date, visit_time: ed.visit_time ?? j.visit_time });
   if (act === "claim") return openClaim(j);
   if (act === "report") return openReport(j);
   if (act === "uncancel") return saveReport(j, "uncancel");
