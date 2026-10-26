@@ -224,6 +224,7 @@ html[data-band="light"] .band{border-bottom:1px solid var(--line);box-shadow:0 1
 html[data-band="brand"]{--band:var(--brand);--band-ink:#ffffff;--band-sub:rgba(255,255,255,.82);--band-line:rgba(255,255,255,.35);--band-field:rgba(255,255,255,.16)}
 html[data-band="brand"] .band .logo,html[data-band="brand"] .login .logo{background:#fff;color:var(--brand)}
 html[data-band="brand"] .login .btn.brand{background:#fff;color:var(--brand)}
+.fee-fold{margin-top:14px;background:var(--card);border-radius:16px;padding:14px 16px}.fee-fold summary{font-weight:700}
 </style>
 </head>
 <body>
@@ -234,6 +235,7 @@ const SB_URL = "https://fqkwokupgcxvcjsbuupb.supabase.co";
 const SB_KEY = "sb_publishable_W0ajtBYOzCg5ZW0vsaagUQ_6_B1OtoR";
 const TK = "menuit_partner_session_v1", FK = "menuit_partner_filters_v3", CK = "menuit_partner_check_v1";
 const PARTS = ["시공", "촬영"];
+const SETL_L = { 작성: "작성 중", 확인요청: "확인 필요", 파트너확인: "정산 요청함", 이의제기: "수정 요청함", 기안완료: "지급 준비", 지급완료: "지급 완료" };
 const PDEF = {
   "login.title": "메뉴잇 파트너", "login.sub": "배정받은 매장을 확인하고, 현장에서 바로 완료와 서명까지.",
   "nav.db": "DB", "nav.done": "Done", "nav.stat": "My Stats", "nav.setl": "Settlement", "nav.set": "Settings",
@@ -633,21 +635,21 @@ function viewStat() {
 }
 function viewSetl() {
   const myParts = S.me?.parts?.length ? S.me.parts : PARTS, myFees = S.fees.filter((f) => myParts.includes(f.part)), multi = new Set(myFees.map((f) => f.part)).size > 1;
-  const cats = {}; for (const f of myFees) { const k = multi ? `${f.part} · ${f.category || "기본"}` : (f.category || "기본"); (cats[k] ||= []).push(f); }
-  const feeTbl = myFees.length ? `<div class="list fee-tbl">${Object.entries(cats).map(([k, list]) => `<span class="cat">${h(k)}</span>${list.map((f) => `<div><span>${h(f.name)}${f.note ? `<small>${h(f.note)}</small>` : ""}</span><b>${f.amount ? won(f.amount) + (f.unit && f.unit !== "건" ? ` / ${h(f.unit)}` : "") : "실비"}</b></div>`).join("")}`).join("")}</div>`
-    : `<div class="empty"><b>등록된 시공비 정책이 없어요</b></div>`;
+  const feeAmt = (f) => f.amount ? won(f.amount) + (f.unit && f.unit !== "건" ? ` / ${h(f.unit)}` : "") : ["distance", "line", "parking"].includes(f.variant) ? "실비" : "-";
+  const feeTbl = myParts.filter((p) => myFees.some((f) => f.part === p)).map((p) => { const cats = {}; for (const f of myFees.filter((x) => x.part === p)) (cats[f.category || "기본"] ||= []).push(f);
+    return `<details class="fold fee-fold"><summary>${h(p)} ${h(PL("title.fees"))}</summary><div class="list fee-tbl">${Object.entries(cats).map(([k, list]) => `<span class="cat">${h(k)}</span>${list.map((f) => `<div><span>${h(f.name)}${f.note ? `<small>${h(f.note)}</small>` : ""}</span><b>${feeAmt(f)}</b></div>`).join("")}`).join("")}</div></details>`; }).join("");
   return `<div class="h2">${h(PL("title.setl"))}</div>${S.setl.length ? S.setl.map((s) => {
       const jobs = S.jobs.filter((j) => j.status === "완료" && j.settle_month === s.month);
-      return `<section class="stmt"><div class="stmt-h"><b>${Number(s.month.slice(0, 4))}년 ${Number(s.month.slice(5))}월</b><span class="badge b-${h(s.status)}">${h(s.status === "확인요청" ? "확인 필요" : s.status)}</span></div>
+      return `<section class="stmt"><div class="stmt-h"><b>${Number(s.month.slice(0, 4))}년 ${Number(s.month.slice(5))}월</b><span class="badge b-${h(s.status)}">${h(SETL_L[s.status] || s.status)}</span></div>
         <div class="stmt-net"><span>실지급액 (원천징수 3.3% 후)</span><b>${won(s.net)}</b></div>
         <div class="list"><div><span>작업</span><b>${s.job_count}건</b></div><div><span>기본 수수료</span><b>${won(s.base_total)}</b></div><div><span>추가 정산</span><b>${won(s.extra_total)}</b></div>
           <div><span>합계 (세전)</span><b>${won(s.total)}</b></div><div><span>원천징수</span><b>-${won(s.income_tax + s.local_tax)}</b></div></div>
         <details class="fold" style="padding:12px 16px"><summary>작업 내역 ${jobs.length}건</summary><div class="list">${jobs.map((j) => `<div><span>${md(doneDate(j))} ${h(j.store_name)}<small>${h(j.work_type || j.part)}${j.extra_fee ? " + 추가 " + won(j.extra_fee) : ""}</small></span><b>${won(feeOf(j))}</b></div>`).join("") || "<div>내역 없음</div>"}</div></details>
-        ${s.status === "확인요청" ? `<div class="stmt-act"><label>의견 (이의가 있으면 꼭 적어 주세요)<textarea id="sn_${h(s.month)}" placeholder="예: 10/12 광안 치킨 추가 설치 1대 누락"></textarea></label>
-          <div class="pair"><button class="btn danger" data-act="setlno" data-m="${h(s.month)}">이의 있음</button><button class="btn go" data-act="setlok" data-m="${h(s.month)}">금액 확인</button></div></div>`
-        : s.partner_note ? `<div class="stmt-act"><span class="muted">내 의견: ${h(s.partner_note)}</span></div>` : ""}</section>`; }).join("")
+        ${s.status === "확인요청" ? `<div class="stmt-act"><label>수정할 내용<textarea id="sn_${h(s.month)}" placeholder="예: 10/12 광안 치킨 추가 설치 1대 누락"></textarea></label>
+          <div class="pair"><button class="btn ghost" data-act="setlno" data-m="${h(s.month)}">수정 요청</button><button class="btn go" data-act="setlok" data-m="${h(s.month)}">정산 요청</button></div></div>`
+        : s.partner_note ? `<div class="stmt-act"><span class="muted">수정 요청: ${h(s.partner_note)}</span></div>` : ""}</section>`; }).join("")
     : `<div class="empty"><b>정산 내역이 아직 없어요</b>월말에 관리자가 마감하면 여기서 금액을 확인해요.</div>`}
-    <div class="h2">${h(PL("title.fees"))} <small>모든 파트너 공통</small></div>${feeTbl}`;
+    ${feeTbl}`;
 }
 function viewSet() {
   const p = S.prof || {}, st = p.settings || {}, mine = st.messages || {}, part = (p.parts || [])[0] || "시공";
@@ -713,10 +715,10 @@ async function changePw() {
 }
 async function respondSetl(month, ok) {
   const note = ($("#sn_" + CSS.escape(month)) || {}).value || "";
-  if (!ok && !note.trim()) return toast("이의 내용을 적어 주세요.", true);
+  if (!ok && !note.trim()) return toast("수정할 내용을 적어 주세요.", true);
   try { const r = await rpc("partner_settlement_respond", { p_token: S.token, p_month: month, p_ok: ok, p_note: note.trim() });
     if (!r || !r.ok) return toast("처리하지 못했어요. 새로고침 후 다시 시도해 주세요.", true);
-    toast(ok ? "금액을 확인했어요. 지급 절차가 진행돼요." : "이의를 전달했어요."); load();
+    toast(ok ? "정산 요청했어요." : "수정 요청을 보냈어요."); load();
   } catch { toast("처리하지 못했어요.", true); }
 }
 
