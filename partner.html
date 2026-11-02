@@ -98,6 +98,17 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .note.env{background:#f1f5fb}.note.env b{color:var(--sky)}
 .note.sp{background:#fff6e0}.note.sp b{color:var(--amber)}
 .note.cx{background:var(--alert-soft)}.note.cx b{color:var(--alert)}
+.photos{border:1px solid var(--line,#e5e7e1);border-radius:14px;padding:10px 12px}
+.photos .ph-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
+.photos .ph-h small{font-weight:600;color:var(--ink3)}.photos .ph-h small.need{color:var(--alert)}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px;margin-top:8px}
+.ph-grid .ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#eee}
+.ph-grid .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-grid .ph button{position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:15px;line-height:26px;padding:0}
+.ph-add{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;min-height:52px;border-radius:12px;border:2px dashed var(--line,#d5d8d0);font-weight:800;font-size:1.05em;cursor:pointer}
+.ph-add input{display:none}
+.dist{display:flex;justify-content:space-between;gap:8px;align-items:center;border-radius:12px;padding:10px 12px;background:#f3f1fb;font-size:.9em}
+.dist b{font-size:1.05em}.dist small{color:var(--ink3)}
 .fee{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line2)}
 .fee span{font-size:.84em;color:var(--ink2)}.fee span small{display:block;color:var(--ink3);font-size:.92em;margin-top:2px}
 .fee b{font-size:1.08em;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -670,7 +681,7 @@ async function submitSign(j, btn) {
   try {
     if (j.status !== "완료") {
       const u = await rpc("partner_update_job", { p_token: S.token, p_job: j.id, p_visit_date: j.visit_date, p_visit_time: j.visit_time || "", p_status: "완료", p_note: (S.edits[j.id] || {}).partner_note ?? j.partner_note ?? "" });
-      if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
+      if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : u && u.error === "need_photo" ? "완료 사진을 1장 이상 올려 주세요." : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
       j.status = "완료";
     }
     const r = await rpc("sign_submit2", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png"), p_cert: j.part === "촬영" ? cv : null, p_ua: navigator.userAgent, p_agree: true });
@@ -719,6 +730,43 @@ async function saveReport(j, kind) {
 const mapUrl = (a) => "https://map.naver.com/p/search/" + encodeURIComponent(a);
 const instLine = (j) => Object.entries(j.install_items || {}).filter(([, v]) => v && (v.qty || v.method)).map(([k, v]) => `${k} ${v.qty || ""}${v.method ? "(" + v.method + ")" : ""}`.trim()).join(" · ");
 const feeOf = (j) => (j.base_fee || 0) + (j.extra_fee || 0);
+const PH_MAX = 20, FN_URL = SB_URL + "/functions/v1/";
+const ROUTE_SRC = { naver: "네이버 길찾기", osm: "지도 기준", approx: "지도 기준 근사" };
+function distBox(j) {
+  if (j.route_km == null) return j.route_err && j.route_err !== "no_home" ? `<div class="dist"><span>거리 계산 안 됨<small> · ${h({ home_addr: "집주소 확인", store_addr: "매장 주소 확인", route: "경로 없음" }[j.route_err] || "확인 중")}</small></span></div>` : "";
+  const mk = Number(((S.prof || {}).ops || {}).min_km || 100), on = j.fuel_mode === "force" || (j.fuel_mode !== "off" && j.route_km >= mk);
+  return `<div class="dist"><span>편도 <b>${Math.round(j.route_km)}km</b><small> · ${h(ROUTE_SRC[j.route_src] || "")}</small></span><span>${on ? `<b>유류비 반영</b>` : `<small>${mk}km 미만</small>`}</span></div>`;
+}
+function photoBox(j) {
+  if (j.part !== "시공") return "";
+  const ps = j.photos || [], n = ps.length, can = !j.locked && n < PH_MAX;
+  return `<div class="photos"><div class="ph-h"><span>${ic("check")} 완료 사진</span><small class="${n ? "" : "need"}">${n}/${PH_MAX}${n ? "" : " · 1장 이상 필수"}</small></div>
+    ${n ? `<div class="ph-grid">${ps.map((p) => `<div class="ph"><a href="${h(p.url)}" target="_blank" rel="noopener"><img loading="lazy" src="${h(p.url)}" alt=""></a>${j.locked ? "" : `<button data-act="phdel" data-p="${h(p.id)}" aria-label="삭제">×</button>`}</div>`).join("")}</div>` : ""}
+    ${can ? `<label class="ph-add">+ 사진 추가<input type="file" accept="image/*" multiple data-ph="${h(j.id)}"></label>` : ""}</div>`;
+}
+function shrink(file, max = 1600, q = 0.8) {
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { const r = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * r); c.height = Math.round(im.height * r);
+      const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL("image/jpeg", q)); };
+    im.onerror = () => { URL.revokeObjectURL(u); rej(new Error("img")); }; im.src = u; });
+}
+async function photoApi(body) {
+  const r = await fetch(FN_URL + "job-photo", { method: "POST", headers: { "Content-Type": "application/json", apikey: SB_KEY }, body: JSON.stringify({ token: S.token, ...body }) });
+  return r.json();
+}
+async function uploadPhotos(jobId, files) {
+  const j = S.jobs.find((x) => x.id === jobId); if (!j) return;
+  const room = PH_MAX - (j.photos || []).length, list = [...files].slice(0, Math.max(0, room));
+  if (files.length > room) toast(`사진은 ${PH_MAX}장까지예요. ${list.length}장만 올려요.`, true);
+  let ok = 0;
+  for (let i = 0; i < list.length; i++) {
+    toast(`사진 올리는 중… ${i + 1}/${list.length}`);
+    try { const r = await photoApi({ action: "upload", job_id: jobId, data: await shrink(list[i]) });
+      if (r && r.ok) { ok++; (j.photos ||= []).push(r.photo); } else if (r && r.error === "auth") return authFail(); else if (r && r.error === "limit") break; }
+    catch {}
+  }
+  toast(ok === list.length ? `사진 ${ok}장 올렸어요.` : `${ok}장 올렸어요. 나머지는 다시 시도해 주세요.`, ok !== list.length); render();
+}
 let CHK = {}; try { CHK = JSON.parse(store.get(CK) || "{}"); } catch {}
 function checklist(j) {
   const items = CHECK[j.part] || [], st = CHK[j.id] || [], n = items.filter((_, i) => st[i]).length;
@@ -750,6 +798,8 @@ function ticket(j) {
       ${j.install_env ? `<div class="note env"><b>${h(PL("note.env"))}</b>${h(j.install_env)}</div>` : ""}
       ${j.special_notes ? `<div class="note sp"><b>${h(PL("note.sp"))}</b>${h(j.special_notes)}</div>` : ""}
       ${j.work_detail ? `<div class="note"><b>${h(PL("note.req"))}</b>${h(j.work_detail)}</div>` : ""}
+      ${distBox(j)}
+      ${photoBox(j)}
       ${j.base_fee || j.extra_fee ? `<div class="fee"><span>${h(j.work_type || j.part)}${j.extra_fee ? `<small>추가 ${won(j.extra_fee)}${j.extra_note ? " · " + h(j.extra_note) : ""}</small>` : ""}${j.extra_claim && j.extra_claim !== j.extra_fee ? `<small style="color:var(--amber)">추가 요청 ${won(j.extra_claim)} · 확인 중</small>` : ""}</span><b>${won(feeOf(j))}</b></div>` : ""}
       <div class="quick">
         ${j.store_address ? `<a href="${h(mapUrl(j.store_address))}" target="_blank" rel="noopener">${ic("map")}${h(PL("q.map"))}</a>` : `<button disabled>${ic("map")}주소 없음</button>`}
@@ -847,6 +897,7 @@ function viewSet() {
     <section class="set"><h3>내 정보</h3>
       <label>연락처<input id="s_phone" value="${h(p.phone || "")}" inputmode="tel"></label>
       <label>활동 지역<input id="s_region" value="${h(p.region || "")}" placeholder="예: 부산 동부"></label>
+      <label>출발지 (집주소)<input id="s_home" value="${h(p.home_address || "")}" placeholder="예: 부산 해운대구 센텀중앙로 79" autocomplete="street-address"></label>
       <p class="hint">이름과 종목은 관리자만 바꿀 수 있어요. (${h(p.name || "")} · ${h((p.parts || []).join(", "))})</p></section>
     <section class="set"><h3>지급 계좌</h3>
       <div class="pair"><label>은행<input id="s_bank" value="${h(p.bank || "")}"></label><label>예금주<input id="s_holder" value="${h(p.holder || "")}"></label></div>
@@ -893,7 +944,9 @@ async function saveSettings() {
     const r = await rpc("partner_settings_save", { p_token: S.token, p_phone: $("#s_phone").value.trim(), p_region: $("#s_region").value.trim(), p_bank: $("#s_bank").value.trim(),
       p_account: $("#s_account").value.trim(), p_holder: $("#s_holder").value.trim(), p_settings: st });
     if (!r || !r.ok) return toast("저장하지 못했어요.", true);
-    toast("설정을 저장했어요."); await load();
+    const home = $("#s_home").value.trim();
+    if (home !== (p.home_address || "")) { const r2 = await rpc("partner_home_save", { p_token: S.token, p_addr: home }); if (!r2 || !r2.ok) return toast("출발지를 저장하지 못했어요.", true); }
+    toast(home !== (p.home_address || "") ? "저장했어요. 거리는 잠시 뒤 반영돼요." : "설정을 저장했어요."); await load();
   } catch { toast("저장하지 못했어요.", true); }
 }
 async function changePw() {
@@ -923,6 +976,7 @@ document.addEventListener("input", (e) => {
 });
 document.addEventListener("change", (e) => {
   const t = e.target;
+  if (t.dataset.ph) { const f = t.files; if (f && f.length) uploadPhotos(t.dataset.ph, f); t.value = ""; return; }
   if (t.dataset.chk) { const a = CHK[t.dataset.chk] ||= []; a[Number(t.dataset.i)] = t.checked; store.set(CK, JSON.stringify(CHK)); t.closest(".chk").classList.toggle("on", t.checked);
     const det = t.closest("details"), items = CHECK[(S.jobs.find((j) => j.id === t.dataset.chk) || {}).part] || []; if (det) det.querySelector(".sp").textContent = `${items.filter((_, i) => a[i]).length}/${items.length}`; }
 });
@@ -968,6 +1022,7 @@ document.addEventListener("click", async (e) => {
   if (act === "note") return save(j, { partner_note: ed.partner_note ?? j.partner_note, visit_date: j.visit_date, visit_time: j.visit_time }, "메모를 저장했어요.");
   if (act === "done") {
     if (j.status !== "일정확정" || !j.visit_date) return toast("방문 날짜를 먼저 저장해 주세요.", true);
+    if (j.part === "시공" && !(j.photos || []).length) return toast("완료 사진을 1장 이상 올려 주세요.", true);
     return openSign(j);
   }
   if (act === "undo") {
@@ -975,6 +1030,11 @@ document.addEventListener("click", async (e) => {
     return save(j, { status: "일정확정" }, "완료를 취소했어요.");
   }
   if (act === "sign") return openSign(j);
+  if (act === "phdel") {
+    if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "?"; b.style.background = "var(--alert)"; return; }
+    try { const r = await photoApi({ action: "delete", job_id: j.id, photo_id: b.dataset.p }); if (r && r.ok) { j.photos = (j.photos || []).filter((p) => p.id !== b.dataset.p); toast("사진을 지웠어요."); render(); } else toast("지우지 못했어요.", true); } catch { toast("지우지 못했어요.", true); }
+    return;
+  }
 });
 document.addEventListener("visibilitychange", () => { if (!document.hidden && S.token && Date.now() - S.loadedAt > 60e3) load(); });
 
