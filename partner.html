@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <title>메뉴잇 파트너</title>
 <style>
-/* 작업 지시서: 어두운 오늘 패널 + 절취선이 있는 작업 티켓. 주황은 '지금 할 일'에만. */
+/* 작업 카드: 어두운 오늘 패널 + 작업 카드. 주황은 '지금 할 일'에만. */
 :root{
   --paper:#eef0ec; --card:#ffffff; --ink:#1b2029; --ink2:#454c58; --ink3:#868c95; --line:#dfe2dc; --line2:#eceee9;
   --brand:#f26b1d; --brand-soft:#fff0e6; --go:#157a52; --go-soft:#e2f3ea; --sky:#2563c9; --sky-soft:#e7effb;
@@ -98,6 +98,11 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .note.env{background:#f1f5fb}.note.env b{color:var(--sky)}
 .note.sp{background:#fff6e0}.note.sp b{color:var(--amber)}
 .note.cx{background:var(--alert-soft)}.note.cx b{color:var(--alert)}
+.items{border:1px solid var(--line,#e5e7e1);border-radius:12px;overflow:hidden;font-size:.86em}
+.items .ih{display:flex;justify-content:space-between;padding:8px 12px;background:#f1f5fb;font-weight:700;font-size:.92em;color:var(--sky)}
+.items table{width:100%;border-collapse:collapse}.items td{padding:7px 12px;border-top:1px solid var(--line,#e5e7e1)}
+.items td.q{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;width:1%}.items td.m{color:var(--ink3);white-space:nowrap;width:1%}
+.needck{font-size:.8em;color:var(--alert);text-align:center;margin-top:-4px}
 .photos{border:1px solid var(--line,#e5e7e1);border-radius:14px;padding:10px 12px}
 .photos .ph-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}
 .photos .ph-h small{font-weight:600;color:var(--ink3)}.photos .ph-h small.need{color:var(--alert)}
@@ -592,7 +597,7 @@ async function load(first) {
     S.me = r.me; S.jobs = r.jobs || []; S.fees = (f && f.fees) || []; S.setl = (st && st.items) || []; S.prof = pr && pr.ok ? pr : null; S.loadedAt = Date.now();
     if (S.prof && S.prof.ui) { UI = S.prof.ui || {}; store.set(UIK, JSON.stringify(UI)); }
     if (first && !store.get(FK) && S.prof?.settings?.dbRange) S.f.db.range = S.prof.settings.dbRange;
-    applyFont(); render();
+    applyFont(); render(); ckMigrate();
   } catch { if (first && !S.me) renderLogin("연결이 원활하지 않아요."); else toast("새로고침에 실패했어요. 연결을 확인해 주세요.", true); }
   finally { S.busy = false; }
 }
@@ -627,8 +632,7 @@ function openMsg(j, key) {
   sheet(`${MSG_LABEL[key]}`, `<p class="muted" style="margin:0">${h(j.store_name)} · ${h(j.contact_name || "점주")} ${h(j.contact_phone || "")}</p>
     <textarea class="msgbox" id="msgText">${h(text)}</textarea>
     <div class="pair"><button class="btn brand" data-act="msgcopy">${ic("chat")}카톡용 복사</button>
-    ${tel ? `<a class="btn" id="smsBtn" href="sms:${h(tel)}?&body=${encodeURIComponent(text)}">문자 보내기</a>` : `<button class="btn" disabled>연락처 없음</button>`}</div>
-    <p class="vars" style="margin:0">보내기 전에 고쳐도 돼요. 기본 문구는 Settings에서 바꿀 수 있어요.</p>`);
+    ${tel ? `<a class="btn" id="smsBtn" href="sms:${h(tel)}?&body=${encodeURIComponent(text)}">문자 보내기</a>` : `<button class="btn" disabled>연락처 없음</button>`}</div>`);
   $("#msgText").addEventListener("input", (e) => { const a = $("#smsBtn"); if (a) a.href = `sms:${tel}?&body=${encodeURIComponent(e.target.value)}`; });
 }
 
@@ -681,7 +685,7 @@ async function submitSign(j, btn) {
   try {
     if (j.status !== "완료") {
       const u = await rpc("partner_update_job", { p_token: S.token, p_job: j.id, p_visit_date: j.visit_date, p_visit_time: j.visit_time || "", p_status: "완료", p_note: (S.edits[j.id] || {}).partner_note ?? j.partner_note ?? "" });
-      if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : u && u.error === "need_photo" ? "완료 사진을 1장 이상 올려 주세요." : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
+      if (!u || !u.ok) { err.textContent = u && u.error === "need_date" ? "방문 날짜를 먼저 저장해 주세요." : u && u.error === "need_photo" ? "완료 사진을 1장 이상 올려 주세요." : u && u.error === "need_check" ? `체크리스트를 먼저 마쳐 주세요. (${(u.missing || []).length}개 남음)` : "완료 처리를 못 했어요. 다시 시도해 주세요."; btn.disabled = false; btn.textContent = "서명 완료"; return; }
       j.status = "완료";
     }
     const r = await rpc("sign_submit2", { p_sign: j.sign_token, p_name: nm, p_image: out.toDataURL("image/png"), p_cert: j.part === "촬영" ? cv : null, p_ua: navigator.userAgent, p_agree: true });
@@ -729,6 +733,12 @@ async function saveReport(j, kind) {
 /* ───── ticket ───── */
 const mapUrl = (a) => "https://map.naver.com/p/search/" + encodeURIComponent(a);
 const instLine = (j) => Object.entries(j.install_items || {}).filter(([, v]) => v && (v.qty || v.method)).map(([k, v]) => `${k} ${v.qty || ""}${v.method ? "(" + v.method + ")" : ""}`.trim()).join(" · ");
+function itemsBox(j) {
+  const rows = Object.entries(j.install_items || {}).filter(([, v]) => v && (v.qty || v.method));
+  if (!rows.length) return "";
+  const sum = rows.reduce((a, [, v]) => a + (Number(String(v.qty || "").replace(/[^0-9]/g, "")) || 0), 0);
+  return `<div class="items"><div class="ih"><span>설치 품목</span><span>${rows.length}종${sum ? " · " + sum + "개" : ""}</span></div><table>${rows.map(([k, v]) => `<tr><td>${h(k)}</td>${v.method ? `<td class="m">${h(v.method)}</td>` : "<td></td>"}<td class="q">${h(v.qty || "-")}</td></tr>`).join("")}</table></div>`;
+}
 const feeOf = (j) => (j.base_fee || 0) + (j.extra_fee || 0);
 const PH_MAX = 20, FN_URL = SB_URL + "/functions/v1/";
 const ROUTE_SRC = { naver: "네이버 길찾기", osm: "지도 기준", approx: "지도 기준 근사" };
@@ -768,9 +778,38 @@ async function uploadPhotos(jobId, files) {
   toast(ok === list.length ? `사진 ${ok}장 올렸어요.` : `${ok}장 올렸어요. 나머지는 다시 시도해 주세요.`, ok !== list.length); render();
 }
 let CHK = {}; try { CHK = JSON.parse(store.get(CK) || "{}"); } catch {}
-function checklist(j) {
-  const items = CHECK[j.part] || [], st = CHK[j.id] || [], n = items.filter((_, i) => st[i]).length;
-  return `<details class="fold"><summary>${ic("check")}현장 체크리스트<span class="sp">${n}/${items.length}</span></summary><div>${items.map((t, i) => `<label class="chk ${st[i] ? "on" : ""}"><input type="checkbox" data-chk="${h(j.id)}" data-i="${i}" ${st[i] ? "checked" : ""}>${h(t)}</label>`).join("")}</div></details>`;
+/* 체크 상태: 서버(jobs.checklist.checked = 항목 이름 목록)가 있으면 서버 기준, 없으면 이 기기 저장값(예전 방식) */
+const ckServer = (j) => !!j && j.checklist !== undefined && j.checklist !== null;
+const ckItems = (j) => CHECK[j.part] || [];
+function ckSet(j) {
+  if (ckServer(j)) return new Set((j.checklist && j.checklist.checked) || []);
+  const st = CHK[j.id] || []; return new Set(ckItems(j).filter((_, i) => st[i]));
+}
+const ckLeft = (j) => { const s = ckSet(j); return ckItems(j).filter((t) => !s.has(t)); };
+function checklist(j, open) {
+  const items = ckItems(j), s = ckSet(j), n = items.filter((t) => s.has(t)).length;
+  return `<details class="fold" ${open || (n && n < items.length) ? "open" : ""}><summary>${ic("check")}현장 체크리스트<span class="sp">${n}/${items.length}</span></summary><div>${items.map((t, i) => `<label class="chk ${s.has(t) ? "on" : ""}"><input type="checkbox" data-chk="${h(j.id)}" data-i="${i}" ${s.has(t) ? "checked" : ""} ${j.status === "완료" ? "disabled" : ""}>${h(t)}</label>`).join("")}</div></details>`;
+}
+async function ckToggle(j, i, on) {
+  const items = ckItems(j), item = items[i]; if (!item) return;
+  if (!ckServer(j)) { const a = CHK[j.id] ||= []; a[i] = on; store.set(CK, JSON.stringify(CHK)); render(); return; }
+  const prev = (j.checklist && j.checklist.checked) || [], next = on ? [...new Set([...prev, item])] : prev.filter((x) => x !== item);
+  j.checklist = { ...(j.checklist || {}), checked: next }; render();
+  try {
+    const r = await rpc("partner_check_save", { p_token: S.token, p_job: j.id, p_checked: next });
+    if (!r || !r.ok) { if (r && r.error === "auth") return authFail(); j.checklist = { ...(j.checklist || {}), checked: prev }; render(); toast(r && r.error === "locked" ? "완료된 건은 체크를 바꿀 수 없어요." : "체크를 저장하지 못했어요.", true); return; }
+    j.checklist = r.checklist;
+  } catch { j.checklist = { ...(j.checklist || {}), checked: prev }; render(); toast("체크를 저장하지 못했어요. 연결을 확인해 주세요.", true); }
+}
+/* 이 기기에만 있던 예전 체크를 서버로 한 번 옮김 */
+async function ckMigrate() {
+  for (const j of S.jobs) {
+    if (!ckServer(j) || j.status === "완료" || ((j.checklist.checked || []).length)) continue;
+    const st = CHK[j.id]; if (!st || !st.some(Boolean)) continue;
+    const checked = ckItems(j).filter((_, i) => st[i]);
+    try { const r = await rpc("partner_check_save", { p_token: S.token, p_job: j.id, p_checked: checked }); if (r && r.ok) { j.checklist = r.checklist; delete CHK[j.id]; } } catch {}
+  }
+  store.set(CK, JSON.stringify(CHK)); render();
 }
 function ticket(j) {
   const done = j.status === "완료", e = S.edits[j.id] || {}, t = today();
@@ -794,7 +833,7 @@ function ticket(j) {
         ${done ? `<div class="r"><span class="k">완료</span><span class="v">${h(dlabel(doneDate(j)))}</span></div>` : ""}
       </div>
       ${j.cancel_requested ? `<div class="note cx"><b>취소 요청함</b>${h(j.cancel_reason)}<div style="margin-top:6px"><button class="chip" data-act="uncancel">요청 철회</button></div></div>` : ""}
-      ${instLine(j) ? `<div class="note env"><b>설치 품목</b>${h(instLine(j))}</div>` : ""}
+      ${itemsBox(j)}
       ${j.install_env ? `<div class="note env"><b>${h(PL("note.env"))}</b>${h(j.install_env)}</div>` : ""}
       ${j.special_notes ? `<div class="note sp"><b>${h(PL("note.sp"))}</b>${h(j.special_notes)}</div>` : ""}
       ${j.work_detail ? `<div class="note"><b>${h(PL("note.req"))}</b>${h(j.work_detail)}</div>` : ""}
@@ -807,12 +846,12 @@ function ticket(j) {
         <button data-act="msg" data-k="${done ? "customer_done" : "customer_scheduled"}">${ic("chat")}${h(PL("q.msg"))}</button>
         ${j.locked ? `<button disabled>${ic("flag")}마감됨</button>` : `<button data-act="report">${ic("flag")}${h(PL("q.report"))}</button>`}
       </div>
+      ${!done ? checklist(j) : ""}
       ${done ? "" : `<div class="when"><label>방문 날짜<input type="date" data-e="visit_date" value="${h(vd)}"></label><label>시간<input data-e="visit_time" placeholder="14시" value="${h(vt)}"></label></div>`}
       ${step === 1 ? `<button class="btn brand" data-act="date">${ic("cal")}${h(PL("btn.date"))}</button>`
-      : step === 2 ? `<button class="btn go" data-act="done">${ic("check")}${h(PL("btn.done"))}</button><button class="btn ghost" data-act="date">${h(PL("btn.redate"))}</button>`
+      : step === 2 ? (ckLeft(j).length ? `<button class="btn go" data-act="done" disabled>${ic("check")}${h(PL("btn.done"))}</button><div class="needck">체크리스트 ${ckLeft(j).length}개를 마쳐야 완료할 수 있어요</div>` : `<button class="btn go" data-act="done">${ic("check")}${h(PL("btn.done"))}</button>`) + `<button class="btn ghost" data-act="date">${h(PL("btn.redate"))}</button>`
       : step === 3 ? `<button class="btn brand" data-act="sign">${ic("pen")}${h(PL("btn.sign"))}</button>${!j.locked ? `<button class="btn ghost" data-act="undo">완료 취소</button>` : ""}`
       : `<div class="signed">${ic("check")}${h(DOC[j.part] || "확인서")} 서명 완료${j.sign_name ? " · " + h(j.sign_name) : ""}</div>`}
-      ${!done ? checklist(j) : ""}
       <details class="fold"><summary>${ic("won")}메모 · 추가 정산<span class="sp">${[j.partner_note ? "메모" : "", j.extra_claim ? "요청됨" : ""].filter(Boolean).join(" · ")}</span></summary><div>
         <textarea data-e="partner_note" placeholder="현장 메모 (관리자도 볼 수 있어요)">${h(e.partner_note ?? j.partner_note ?? "")}</textarea>
         <div class="pair"><button class="btn ghost sm" data-act="note">메모 저장</button>${j.locked ? `<button class="btn ghost sm" disabled>정산 마감</button>` : `<button class="btn ghost sm" data-act="claim">추가 정산 요청</button>`}</div></div></details>
@@ -828,17 +867,18 @@ function tableView(list, dateOf) {
       <td class="n">${(j.base_fee || 0).toLocaleString()}</td><td class="n">${j.extra_fee ? j.extra_fee.toLocaleString() : j.extra_claim ? `<small>요청 ${j.extra_claim.toLocaleString()}</small>` : "-"}</td><td class="n"><b>${feeOf(j).toLocaleString()}</b></td></tr>`).join("")}
     </tbody><tfoot><tr><td colspan="2">합계 ${rows.length}건</td><td class="n">${tb.toLocaleString()}</td><td class="n">${te.toLocaleString()}</td><td class="n">${(tb + te).toLocaleString()}</td></tr></tfoot></table></div>`;
 }
-const vtog = (n) => `<div class="vtog"><span>${n}건</span><div class="sw"><button class="${S.f.view !== "table" ? "on" : ""}" data-act="view" data-v="card">티켓</button><button class="${S.f.view === "table" ? "on" : ""}" data-act="view" data-v="table">금액 표</button></div></div>`;
+const vtog = (n) => `<div class="vtog"><span>${n}건</span><div class="sw"><button class="${S.f.view !== "table" ? "on" : ""}" data-act="view" data-v="card">카드</button><button class="${S.f.view === "table" ? "on" : ""}" data-act="view" data-v="table">금액 표</button></div></div>`;
 function band() {
   const t = today(), m = t.slice(0, 7), todays = S.jobs.filter((j) => j.status !== "완료" && j.visit_date === t).sort((a, b) => String(a.visit_time).localeCompare(String(b.visit_time)));
   const next = todays[0] || S.jobs.filter((j) => j.status === "일정확정" && j.visit_date > t).sort((a, b) => a.visit_date.localeCompare(b.visit_date))[0];
   const monthFee = S.jobs.filter((j) => j.status === "완료" && doneDate(j).startsWith(m)).reduce((a, j) => a + feeOf(j), 0);
   const undated = S.jobs.filter((j) => j.status === "배정").length, unsigned = S.jobs.filter((j) => j.status === "완료" && !j.signed).length;
+  const ckTodo = S.jobs.filter((j) => j.status === "일정확정" && j.visit_date && j.visit_date <= t && ckLeft(j).length).length;
   return `<section class="band"><div class="in">
     <div class="top"><div class="logo">M</div><div class="who"><b>${h(S.me?.name || "")} 님</b><small>${h((S.me?.parts || []).join(" · "))} 파트너</small></div><button class="rf" data-act="reload" aria-label="새로고침">${ic("refresh")}</button></div>
     <div class="today"><div class="big num">${todays.length}<small>${h(PL("band.today"))}</small></div>
       <div class="next">${next ? `<span>${next.visit_date === t ? h(PL("band.next")) : dlabel(next.visit_date)}</span><b><em>${h(next.visit_time || "시간 미정")}</em> ${h(next.store_name)}</b>` : `<span>오늘 방문</span><b>예정된 방문이 없어요</b>`}</div></div>
-    <div class="mini-stats"><span>날짜 미정<b>${undated}</b></span><span>서명 대기<b>${unsigned}</b></span><span>${Number(m.slice(5))}월 수수료<b>${won(monthFee)}</b></span></div>
+    <div class="mini-stats"><span>날짜 미정<b>${undated}</b></span><span>서명 대기<b>${unsigned}</b></span>${ckTodo ? `<span>체크 미완료<b>${ckTodo}</b></span>` : ""}<span>${Number(m.slice(5))}월 수수료<b>${won(monthFee)}</b></span></div>
   </div></section>`;
 }
 function viewDB() {
@@ -977,8 +1017,7 @@ document.addEventListener("input", (e) => {
 document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.ph) { const f = t.files; if (f && f.length) uploadPhotos(t.dataset.ph, f); t.value = ""; return; }
-  if (t.dataset.chk) { const a = CHK[t.dataset.chk] ||= []; a[Number(t.dataset.i)] = t.checked; store.set(CK, JSON.stringify(CHK)); t.closest(".chk").classList.toggle("on", t.checked);
-    const det = t.closest("details"), items = CHECK[(S.jobs.find((j) => j.id === t.dataset.chk) || {}).part] || []; if (det) det.querySelector(".sp").textContent = `${items.filter((_, i) => a[i]).length}/${items.length}`; }
+  if (t.dataset.chk) { const j = S.jobs.find((x) => x.id === t.dataset.chk); if (j) ckToggle(j, Number(t.dataset.i), t.checked); }
 });
 document.addEventListener("click", async (e) => {
   const jr = e.target.closest("[data-jump]"); if (jr) { S.f.view = "card"; saveF(); render(); const el = document.querySelector(`.tk[data-id="${jr.dataset.jump}"]`); if (el) el.scrollIntoView({ block: "center" }); return; }
@@ -1023,6 +1062,7 @@ document.addEventListener("click", async (e) => {
   if (act === "done") {
     if (j.status !== "일정확정" || !j.visit_date) return toast("방문 날짜를 먼저 저장해 주세요.", true);
     if (j.part === "시공" && !(j.photos || []).length) return toast("완료 사진을 1장 이상 올려 주세요.", true);
+    if (ckLeft(j).length) return toast(`체크리스트 ${ckLeft(j).length}개가 남았어요.`, true);
     return openSign(j);
   }
   if (act === "undo") {
